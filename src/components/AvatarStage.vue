@@ -26,6 +26,8 @@ const props = defineProps<{
   config: AvatarConfig
   /** 顯示慢動作與圖層除錯面板 */
   debug?: boolean
+  /** 窄螢幕時把預覽圖固定在畫面頂端（外層需為 grid/flex 容器，讓預覽能跨過整頁黏住） */
+  stickyOnMobile?: boolean
 }>()
 
 const ACTIONS: [AnimName, string][] = [
@@ -132,7 +134,7 @@ useRafLoop((now, dt) => {
 </script>
 
 <template>
-  <section class="stage" aria-label="角色預覽">
+  <section class="stage" :class="{ 'mobile-sticky': stickyOnMobile }" aria-label="角色預覽">
     <div class="views">
       <div class="portrait">
         <canvas ref="portraitEl" class="pixel" :width="PORTRAIT_W" :height="PORTRAIT_H" aria-label="角色正面預覽"></canvas>
@@ -278,6 +280,38 @@ useRafLoop((now, dt) => {
 @media (hover: none) {
   .hint {
     display: none;
+  }
+}
+/*
+ * 手機：外層容器 display: contents，讓 .views 成為頁面 grid 的直接子元素，
+ * 才能在捲動整個造型面板時一直黏在頂端。
+ */
+@media (max-width: 820px) {
+  .mobile-sticky {
+    display: contents;
+  }
+  .mobile-sticky .views {
+    position: sticky;
+    top: env(safe-area-inset-top, 0px);
+    z-index: 5;
+    grid-template-columns: auto minmax(0, 1fr);
+    background: var(--bg);
+    padding-block: 8px;
+    margin-block: -8px;
+  }
+  .mobile-sticky .portrait {
+    padding: 6px;
+  }
+  .mobile-sticky .portrait canvas {
+    width: auto;
+    height: 120px;
+    max-width: none;
+  }
+  .mobile-sticky .bar {
+    margin-top: 0;
+  }
+  .mobile-sticky .status {
+    margin: 0;
   }
 }
 </style>
