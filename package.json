@@ -9,7 +9,8 @@
     "preview": "vite preview",
     "typecheck": "vue-tsc -b",
     "build:assets": "tsx scripts/build-assets.ts",
-    "verify:assets": "tsx scripts/verify-assets.ts"
+    "verify:assets": "tsx scripts/verify-assets.ts",
+    "test:db": "tsx scripts/test-db.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.117.2",
@@ -17,6 +18,7 @@
     "vue-router": "^5.3.1"
   },
   "devDependencies": {
+    "@electric-sql/pglite": "^0.5.8",
     "@types/node": "^26.6.3",
     "@types/pngjs": "^6.0.5",
     "@vitejs/plugin-vue": "^6.0.9",
