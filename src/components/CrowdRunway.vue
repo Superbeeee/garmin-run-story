@@ -23,6 +23,8 @@ const W = computed(() => (props.runners.length > 20 ? 480 : 384))
 const H = computed(() => Math.round((W.value * 9) / 16))
 const TRACK_TOP = 72
 const MARGIN = 20
+/** 腳底離畫布底部的距離，留空間給名字 */
+const BOTTOM_PAD = 16
 
 const canvasEl = ref<HTMLCanvasElement>()
 const labelsEl = ref<HTMLCanvasElement>()
@@ -55,11 +57,12 @@ watch(
     sprites = runners.map((r) => {
       const prev = old.get(r.id)
       if (prev) {
-        if (prev.runner.config !== r.config) {
-          prev.ready = false
-          preloadAvatar(r.config).then(() => (prev.ready = true), () => {})
+        // 重新抓資料時物件會換新，比對內容；造型真的改了才預載，載完再替換，避免閃爍
+        if (JSON.stringify(prev.runner.config) !== JSON.stringify(r.config)) {
+          preloadAvatar(r.config).then(() => (prev.runner = r), () => {})
+        } else {
+          prev.runner = r
         }
-        prev.runner = r
         return prev
       }
       const actor = new AvatarActor()
@@ -68,7 +71,7 @@ watch(
         runner: r,
         actor,
         x: rand(MARGIN, W.value - MARGIN),
-        y: rand(TRACK_TOP + 40, H.value - 6),
+        y: rand(TRACK_TOP + 40, H.value - BOTTOM_PAD),
         dir: Math.random() < 0.5 ? -1 : 1,
         ready: false,
         nextMode: now + rand(2000, 8000),
@@ -85,7 +88,7 @@ watch(
 watch(W, (w) => {
   for (const s of sprites) {
     s.x = Math.min(s.x, w - MARGIN)
-    s.y = Math.min(s.y, H.value - 6)
+    s.y = Math.min(s.y, H.value - BOTTOM_PAD)
   }
 })
 

@@ -23,6 +23,7 @@ const routes: RouteRecordRaw[] = [
     component: () => import('./pages/DonePage.vue'),
     beforeEnter: () => (getRegistration() ? true : { name: 'signup' }),
   },
+  { path: '/roster', name: 'roster', component: () => import('./pages/RosterPage.vue') },
   { path: '/:pathMatch(.*)*', redirect: '/' },
 ]
 
