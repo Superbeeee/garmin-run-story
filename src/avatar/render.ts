@@ -13,25 +13,35 @@ const FOOT_Y = 62
 /** 正面大圖的畫布尺寸與從 front 圖裁切的範圍 */
 export const PORTRAIT_W = 40
 export const PORTRAIT_H = 62
-const PORTRAIT_SRC = { x: 12, y: 4, w: 40, h: 52 }
-const PORTRAIT_DY = 10
+// 從格子第 0 列開始裁，高帽子才不會被切掉；原有圖層的位置與原型相同
+const PORTRAIT_SRC = { x: 12, y: 0, w: 40, h: 56 }
+const PORTRAIT_DY = 6
+/** 正面圖示最高只到這裡，避免戴高帽時超出畫布 */
+const PORTRAIT_ICON_MIN_Y = 11
 
-/** 頭與頭髮圖層合併的頭頂位置（格內座標） */
+const HEAD_TOP_SLOTS = new Set(['head', 'hair', 'hat', 'hattrim'])
+
+/**
+ * 頭頂位置（格內座標）：top 含帽子（頭頂圖示用），hairTop 只算頭與頭髮（汗滴用）；
+ * 水平位置以頭為準。
+ */
 function headBox(layers: LayerRef[], sheet: SheetName, frame: number) {
   let top = FRAME
+  let hairTop = FRAME
   let cx = 32
   let right = 40
   for (const L of layers) {
-    if (L.slot !== 'head' && L.slot !== 'hair') continue
+    if (!HEAD_TOP_SLOTS.has(L.slot)) continue
     const b = frameBox(L.key, sheet, frame)
     if (!b) continue
     if (b[0] < top) top = b[0]
+    if ((L.slot === 'head' || L.slot === 'hair') && b[0] < hairTop) hairTop = b[0]
     if (L.slot === 'head') {
       cx = b[1]
       right = b[2]
     }
   }
-  return { top, cx, right }
+  return { top, hairTop, cx, right }
 }
 
 /** 畫頭頂圖示；(x, y) 為圖示底部中心（sweat 為左緣） */
@@ -90,9 +100,8 @@ export function drawAvatar(ctx: CanvasRenderingContext2D, config: AvatarConfig, 
   if (pose.emote) {
     const hb = headBox(layers, pose.anim, pose.frame)
     const wx = (px: number) => (flip ? gx + FRAME / 2 - px : gx - FRAME / 2 + px)
-    const headTop = top + hb.top
-    if (pose.emote.icon === 'sweat') drawIcon(ctx, pose, flip ? wx(hb.right) - 6 : wx(hb.right) + 1, headTop + 10)
-    else drawIcon(ctx, pose, wx(hb.cx), headTop - 1)
+    if (pose.emote.icon === 'sweat') drawIcon(ctx, pose, flip ? wx(hb.right) - 6 : wx(hb.right) + 1, top + hb.hairTop + 10)
+    else drawIcon(ctx, pose, wx(hb.cx), top + hb.top - 1)
   }
   return layers
 }
@@ -111,7 +120,7 @@ export function drawPortrait(ctx: CanvasRenderingContext2D, config: AvatarConfig
     // 格內座標轉成畫布座標：減去裁切起點、加上下移量
     const toX = (px: number) => x + px - S.x
     const toY = (py: number) => y + py - S.y + PORTRAIT_DY
-    if (pose.emote.icon === 'sweat') drawIcon(ctx, pose, toX(hb.right) + 1, toY(hb.top) + 10)
-    else drawIcon(ctx, pose, toX(hb.cx), toY(hb.top) - 1)
+    if (pose.emote.icon === 'sweat') drawIcon(ctx, pose, toX(hb.right) + 1, toY(hb.hairTop) + 10)
+    else drawIcon(ctx, pose, toX(hb.cx), Math.max(PORTRAIT_ICON_MIN_Y, toY(hb.top) - 1))
   }
 }

@@ -101,6 +101,11 @@ function creditsFor(L: LayerSource, path: string): Credit[] {
   return hits
 }
 
+/** 一般素材為 {路徑}/{動作}.png；預先上色的素材為 {路徑}/{動作}/{variant}.png */
+function sheetFile(path: string, anim: string, variant?: string): string {
+  return variant ? `${path}/${anim}/${variant}.png` : `${path}/${anim}.png`
+}
+
 // ---------- 圖片 ----------
 
 function readPng(file: string): PNG {
@@ -162,7 +167,7 @@ function main(): void {
   ensureRepo()
 
   const paths = new Map(LAYERS.map((L) => [L.key, spritePath(L)]))
-  const spriteFiles = [...new Set([...paths.values()])].flatMap((p) => ANIMS.map((a) => `/spritesheets/${p}/${a}.png`))
+  const spriteFiles = [...new Set(LAYERS.flatMap((L) => ANIMS.map((a) => `/spritesheets/${sheetFile(paths.get(L.key)!, a, L.variant)}`)))]
   console.log(`› sparse checkout ${spriteFiles.length} 張精靈圖…`)
   sparseCheckout(['/sheet_definitions/', '/palette_definitions/', ...spriteFiles])
 
@@ -179,7 +184,7 @@ function main(): void {
     const wantBox = BBOX_SLOTS.includes(L.slot)
 
     for (const anim of ANIMS) {
-      const file = join(REPO, 'spritesheets', p, `${anim}.png`)
+      const file = join(REPO, 'spritesheets', sheetFile(p, anim, L.variant))
       if (!existsSync(file)) throw new Error(`${L.key}: 缺少 ${anim}（${file}）`)
       const src = readPng(file)
       if (src.width % FRAME || src.height < FRAME * 4) throw new Error(`${L.key}/${anim}: 尺寸 ${src.width}×${src.height} 不符 LPC 格式`)

@@ -155,8 +155,35 @@ export const EMOTES: readonly { face: string; label: string; icon: IconName }[] 
 /** 眨眼用的表情 */
 export const BLINK_FACES = ['closing', 'closed'] as const
 
-/** 切換性別時套用的預設（膚色、眼睛、髮帶沿用目前的選擇） */
-export const GENDER_DEFAULTS: Record<Gender, Omit<AvatarConfig, 'gender' | 'skin' | 'eye' | 'band' | 'bandColor'>> = {
+export const HATS: readonly Option[] = [
+  ['none', '不戴'],
+  ['christmas', '聖誕帽'],
+  ['elf', '精靈帽'],
+  ['bandana', '頭巾'],
+  ['bowler', '紳士帽'],
+  ['tophat', '高禮帽'],
+  ['wizard', '巫師帽'],
+  ['crown', '皇冠'],
+]
+/** 顏色固定、不提供換色的帽子 */
+export const HATS_FIXED_COLOR = new Set(['crown'])
+
+export const GLASSES: readonly Option[] = [
+  ['none', '不戴'],
+  ['glasses', '一般眼鏡'],
+  ['halfmoon', '半框眼鏡'],
+  ['nerd', '粗框眼鏡'],
+  ['round', '圓框眼鏡'],
+  ['secretary', '貓眼眼鏡'],
+  ['sunglasses', '墨鏡'],
+  ['shades', '淺色墨鏡'],
+]
+
+/** 切換性別時套用的預設（膚色、眼睛、配件沿用目前的選擇） */
+export const GENDER_DEFAULTS: Record<
+  Gender,
+  Omit<AvatarConfig, 'gender' | 'skin' | 'eye' | 'band' | 'bandColor' | 'hat' | 'hatColor' | 'glasses' | 'glassesColor'>
+> = {
   male: { build: 'male', head: 'male', hair: 'bangsshort', hairColor: 'black', top: 'singlet', topColor: 'red', legs: 'shortshorts', legsColor: 'black', shoesColor: 'white', face: 'happy' },
   female: { build: 'female', head: 'female', hair: 'half_up', hairColor: 'dark_brown', top: 'scoop', topColor: 'lavender', legs: 'leggings', legsColor: 'charcoal', shoesColor: 'white', face: 'happy' },
 }
@@ -168,7 +195,19 @@ export const DEFAULT_CONFIG: AvatarConfig = {
   eye: 'blue',
   band: 'none',
   bandColor: 'white',
+  hat: 'none',
+  hatColor: 'red',
+  glasses: 'none',
+  glassesColor: 'black',
 }
+
+/** 後來新增的欄位；舊資料缺少時補上預設值 */
+export const OPTIONAL_DEFAULTS = {
+  hat: DEFAULT_CONFIG.hat,
+  hatColor: DEFAULT_CONFIG.hatColor,
+  glasses: DEFAULT_CONFIG.glasses,
+  glassesColor: DEFAULT_CONFIG.glassesColor,
+} as const
 
 export function withGender(c: AvatarConfig, gender: Gender): AvatarConfig {
   return { ...c, gender, ...GENDER_DEFAULTS[gender] }
@@ -195,5 +234,9 @@ export function randomConfig(): AvatarConfig {
     shoesColor: pick(CLOTH_COLORS)[0],
     band: Math.random() < 0.3 ? 'thick' : 'none',
     bandColor: pick(CLOTH_COLORS)[0],
+    hat: Math.random() < 0.4 ? pick(HATS)[0] : 'none',
+    hatColor: pick(CLOTH_COLORS)[0],
+    glasses: Math.random() < 0.4 ? pick(GLASSES)[0] : 'none',
+    glassesColor: pick(CLOTH_COLORS)[0],
   }
 }

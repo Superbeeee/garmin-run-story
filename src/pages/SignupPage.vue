@@ -12,8 +12,11 @@ import {
   EYE_OPTIONS,
   FACES,
   GENDERS,
+  GLASSES,
   HAIR_BY,
   HAIR_COLORS,
+  HATS,
+  HATS_FIXED_COLOR,
   HEAD_BY,
   LEGS,
   SKINS,
@@ -163,7 +166,23 @@ async function submit() {
         <ColorSwatches v-model="config.shoesColor" :options="CLOTH_COLORS" material="cloth" label="鞋子顏色" />
       </fieldset>
       <fieldset>
-        <legend>配件</legend>
+        <legend>帽子</legend>
+        <OptionChips v-model="config.hat" :options="HATS" label="帽子" />
+        <ColorSwatches
+          v-if="config.hat !== 'none' && !HATS_FIXED_COLOR.has(config.hat)"
+          v-model="config.hatColor"
+          :options="CLOTH_COLORS"
+          material="cloth"
+          label="帽子顏色"
+        />
+      </fieldset>
+      <fieldset>
+        <legend>眼鏡</legend>
+        <OptionChips v-model="config.glasses" :options="GLASSES" label="眼鏡" />
+        <ColorSwatches v-if="config.glasses !== 'none'" v-model="config.glassesColor" :options="CLOTH_COLORS" material="cloth" label="鏡框顏色" />
+      </fieldset>
+      <fieldset>
+        <legend>髮帶</legend>
         <OptionChips v-model="config.band" :options="BANDS" label="髮帶" />
         <ColorSwatches v-if="config.band !== 'none'" v-model="config.bandColor" :options="CLOTH_COLORS" material="cloth" label="髮帶顏色" />
       </fieldset>

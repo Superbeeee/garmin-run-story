@@ -58,10 +58,14 @@ await expectError(db, '造型缺欄位', 'select * from public.register_player($
 await expectError(db, '造型多欄位', 'select * from public.register_player($1, $2)', ['多欄位', { ...avatar, x: 'y' }], /invalid_avatar/)
 await expectError(db, '造型欄位非字串', 'select * from public.register_player($1, $2)', ['非字串', { ...avatar, hair: 1 }], /invalid_avatar/)
 await expectError(db, '造型 gender 不合法', 'select * from public.register_player($1, $2)', ['性別', { ...avatar, gender: 'x' }], /invalid_avatar/)
+const withAcc = { ...avatar, hat: 'christmas', hatColor: 'red', glasses: 'sunglasses', glassesColor: 'black' }
+const rAcc = await db.query('select * from public.register_player($1, $2)', ['戴帽子', withAcc])
+check('含帽子與眼鏡的造型可以報名', rAcc.rows.length === 1)
+await expectError(db, '帽子欄位非字串', 'select * from public.register_player($1, $2)', ['帽子錯', { ...withAcc, hat: 1 }], /invalid_avatar/)
 
 // 讀取
 const pub = await db.query('select id, name, avatar, created_at from public.players')
-check('anon 可讀公開欄位', pub.rows.length === 2)
+check('anon 可讀公開欄位', pub.rows.length === 3)
 await expectError(db, 'anon 讀不到 edit_token', 'select edit_token from public.players', [], /permission denied/)
 await expectError(db, 'anon 不能 select *', 'select * from public.players', [], /permission denied/)
 

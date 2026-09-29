@@ -8,6 +8,12 @@ const DB_KEY = 'xmas-runner:mock-db'
 type Row = Player & { editToken: string }
 
 const load = () => readJson<Row[]>(DB_KEY) ?? []
+
+/** 比照 Supabase 版：讀出時正規化造型（補上新欄位預設值），不合法的略過 */
+function toPlayer(r: Row): Player | null {
+  const avatar = parseAvatarConfig(r.avatar)
+  return avatar ? { id: r.id, name: r.name, avatar, createdAt: r.createdAt } : null
+}
 const save = (rows: Row[]) => writeJson(DB_KEY, rows)
 const delay = () => new Promise((r) => setTimeout(r, 300))
 
@@ -34,7 +40,7 @@ export function createMockApi(): Api {
     async getMine(id, editToken) {
       await delay()
       const r = load().find((x) => x.id === id && x.editToken === editToken)
-      return r ? { id: r.id, name: r.name, avatar: r.avatar, createdAt: r.createdAt } : null
+      return r ? toPlayer(r) : null
     },
     async update(id, editToken, name, avatar) {
       await delay()
@@ -47,7 +53,9 @@ export function createMockApi(): Api {
     },
     async list() {
       await delay()
-      return load().map(({ id, name, avatar, createdAt }) => ({ id, name, avatar, createdAt }))
+      return load()
+        .map(toPlayer)
+        .filter((p): p is Player => p !== null)
     },
   }
 }

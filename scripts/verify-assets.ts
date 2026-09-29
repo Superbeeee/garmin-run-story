@@ -30,7 +30,8 @@ let compared = 0
 const protoKeys = new Set(Object.keys(DATA.layers).map(toNewKey))
 const ourKeys = new Set(Object.keys(manifest.layers))
 for (const k of protoKeys) if (!ourKeys.has(k)) problems.push(`缺少圖層 ${k}`)
-for (const k of ourKeys) if (!protoKeys.has(k)) problems.push(`多出圖層 ${k}（原型沒有）`)
+const extras = [...ourKeys].filter((k) => !protoKeys.has(k))
+if (extras.length) console.log(`原型之後新增的圖層（不比對）：${extras.join(', ')}`)
 
 // 逐像素
 for (const [protoKey, anims] of Object.entries(DATA.layers)) {
@@ -59,7 +60,7 @@ for (const [protoKey, anims] of Object.entries(DATA.layers)) {
 const protoCredits = new Set(DATA.credits.map((c) => c.file))
 const ourCredits = new Set(credits.map((c) => c.file))
 for (const f of protoCredits) if (!ourCredits.has(f)) problems.push(`credits 缺少 ${f}`)
-for (const f of ourCredits) if (!protoCredits.has(f)) problems.push(`credits 多出 ${f}（原型沒有）`)
+// 新增素材會多出 credits，屬於預期結果
 
 // 調色盤
 for (const [mat, sets] of Object.entries(DATA.pal)) {
@@ -74,4 +75,4 @@ if (problems.length) {
   console.log(problems.map((p) => '✗ ' + p).join('\n'))
   process.exit(1)
 }
-console.log('✓ 與原型完全一致')
+console.log('✓ 原型有的圖層與原型完全一致')

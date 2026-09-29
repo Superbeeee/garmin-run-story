@@ -13,7 +13,7 @@ export const LPC_COMMIT = '4963a69795255fb15a934c47f478a8bdcf3668f5'
 export const ANIMS = ['idle', 'walk', 'run', 'jump'] as const
 export type AnimName = (typeof ANIMS)[number]
 
-export type Slot = 'hairbg' | 'body' | 'shoes' | 'legs' | 'top' | 'head' | 'face' | 'hair' | 'band'
+export type Slot = 'hairbg' | 'body' | 'shoes' | 'legs' | 'top' | 'head' | 'face' | 'glasses' | 'hair' | 'band' | 'hat' | 'hattrim'
 export type Material = 'body' | 'hair' | 'cloth'
 
 /** 換色基準：palette_definitions 的檔案與色組名稱 */
@@ -36,6 +36,11 @@ export interface LayerSource {
   bodyType: string
   /** 替換路徑中的 ${head}（表情用） */
   head?: 'male' | 'female'
+  /**
+   * 預先上色的素材（sheet_definition 有 variants、沒有 recolors）：取哪一個顏色版本，
+   * 檔案路徑為 {路徑}/{動作}/{variant}.png。取 white 版即可在執行時用 cloth 調色盤換色。
+   */
+  variant?: string
 }
 
 const layers: LayerSource[] = []
@@ -123,7 +128,39 @@ for (const [fit, bodyType] of Object.entries(FIT)) {
 // 配件
 layers.push({ key: 'band/thick', slot: 'band', material: 'cloth', def: 'headwear/coverings/headbands/hat_headband_thick.json', bodyType: 'male' })
 
+// 眼鏡（white 版鏡框可換色，鏡片顏色固定）
+const GLASSES: [string, string][] = [
+  ['glasses', 'facial_glasses'],
+  ['halfmoon', 'facial_glasses_halfmoon'],
+  ['nerd', 'facial_glasses_nerd'],
+  ['round', 'facial_glasses_round'],
+  ['secretary', 'facial_glasses_secretary'],
+  ['shades', 'facial_glasses_shades'],
+  ['sunglasses', 'facial_glasses_sunglasses'],
+]
+for (const [g, file] of GLASSES) {
+  layers.push({ key: `glasses/${g}`, slot: 'glasses', material: 'cloth', def: `headwear/accessories/glasses/${file}.json`, bodyType: 'male', variant: 'white' })
+}
+
+// 帽子：[key, sheet_definition, variant（無則為可換色的單一檔案）]
+const HATS: [string, string, string | undefined][] = [
+  ['christmas', 'headwear/hats/holiday/hat_holiday_christmas.json', 'white'],
+  ['bandana', 'headwear/coverings/bandana/hat_bandana.json', undefined],
+  ['bowler', 'headwear/hats/formal/hat_formal_bowler.json', 'white'],
+  ['tophat', 'headwear/hats/formal/hat_formal_tophat.json', 'white'],
+  ['wizard', 'headwear/hats/magic/hat_magic_wizard.json', 'white'],
+  // 皇冠用金色版，不換色
+  ['crown', 'headwear/hats/formal/hat_formal_crown.json', 'gold'],
+]
+for (const [h, def, variant] of HATS) {
+  layers.push({ key: `hat/${h}`, slot: 'hat', material: 'cloth', def, bodyType: 'male', variant })
+}
+// 聖誕帽、精靈帽的毛邊
+for (const t of ['santa', 'elf']) {
+  layers.push({ key: `hattrim/${t}`, slot: 'hattrim', material: 'cloth', def: `headwear/hats/holiday/hat_holiday_${t}.json`, bodyType: 'male', variant: 'white' })
+}
+
 export const LAYERS: readonly LayerSource[] = layers
 
 /** 需要在 manifest 記錄每格 bounding box 的圖層（用來算頭頂圖示位置） */
-export const BBOX_SLOTS: readonly Slot[] = ['head', 'hair']
+export const BBOX_SLOTS: readonly Slot[] = ['head', 'hair', 'hat', 'hattrim']

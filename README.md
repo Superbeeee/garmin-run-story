@@ -30,7 +30,7 @@ pnpm dev
 ### 串接 Supabase
 
 1. 在 Supabase 建立專案。
-2. 執行 `supabase/migrations/` 裡的 SQL：在 Dashboard 的 SQL Editor 貼上執行，或用 CLI `supabase link` 後執行 `supabase db push`。
+2. 依檔名順序執行 `supabase/migrations/` 裡的所有 SQL：在 Dashboard 的 SQL Editor 逐一貼上執行，或用 CLI `supabase link` 後執行 `supabase db push`。
 3. 複製 `.env.example` 為 `.env.local`，填入 Project URL、anon（publishable）key 與名單頁密語。
 
 ## 部署到 Vercel
