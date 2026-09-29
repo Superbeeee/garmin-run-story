@@ -10,16 +10,20 @@ import credits from '../assets/credits.json'
       角色素材來自
       <a href="https://github.com/LiberatedPixelCup/Universal-LPC-Spritesheet-Character-Generator" target="_blank" rel="noopener">Universal LPC Spritesheet Character Generator</a>
       與 <a href="https://opengameart.org/" target="_blank" rel="noopener">OpenGameArt</a> 的 Liberated Pixel Cup 系列，本站經過裁切與重新上色，修改後的圖同樣依原授權釋出。
-      各素材依其授權（OGA-BY 3.0、CC-BY-SA 3.0、GPL 3.0 等）使用，作者如下。表情頭頂的小圖示為本站自繪。
+      各素材依其授權（OGA-BY 3.0、CC-BY-SA 3.0、GPL 3.0 等）使用。表情頭頂的小圖示為本站自繪。
     </p>
-    <ul>
-      <li v-for="c in credits" :key="c.file">
-        <span class="file">{{ c.file }}</span>：{{ c.authors.join(', ') }}（{{ c.licenses.join(' / ') }}）
-        <span class="src">
-          來源<a v-for="(u, i) in c.urls" :key="u" :href="u" target="_blank" rel="noopener" :aria-label="`${c.file} 來源 ${i + 1}`">{{ i + 1 }}</a>
-        </span>
-      </li>
-    </ul>
+    <!-- 授權要求標示作者，清單不可移除；預設收合以免干擾版面 -->
+    <details>
+      <summary>查看所有素材作者與授權（{{ credits.length }} 項）</summary>
+      <ul>
+        <li v-for="c in credits" :key="c.file">
+          <span class="file">{{ c.file }}</span>：{{ c.authors.join(', ') }}（{{ c.licenses.join(' / ') }}）
+          <span class="src">
+            來源<a v-for="(u, i) in c.urls" :key="u" :href="u" target="_blank" rel="noopener" :aria-label="`${c.file} 來源 ${i + 1}`">{{ i + 1 }}</a>
+          </span>
+        </li>
+      </ul>
+    </details>
   </footer>
 </template>
 
@@ -40,8 +44,13 @@ p {
   margin: 0 0 10px;
   max-width: 80ch;
 }
+summary {
+  cursor: pointer;
+  color: var(--ink);
+  width: fit-content;
+}
 ul {
-  margin: 0;
+  margin: 10px 0 0;
   padding-left: 18px;
   columns: 2;
   column-gap: 28px;
