@@ -1,0 +1,107 @@
+:root {
+  --bg: #eef1f4;
+  --surface: #ffffff;
+  --ink: #17202b;
+  --muted: #5b6675;
+  --line: #d5dbe2;
+  --track: #2f5da8;
+  --accent: #c9ec3c;
+  --accent-ink: #17202b;
+  --danger: #c2332b;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0f151c;
+    --surface: #18212b;
+    --ink: #e7ecf2;
+    --muted: #9aa6b4;
+    --line: #2a3542;
+    --danger: #ff7a70;
+    color-scheme: dark;
+  }
+}
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+html {
+  -webkit-text-size-adjust: 100%;
+}
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', system-ui, sans-serif;
+  font-size: 15px;
+  line-height: 1.6;
+  padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px);
+}
+h1 {
+  font-size: 28px;
+  font-weight: 700;
+  margin: 0 0 4px;
+  letter-spacing: 0.02em;
+}
+canvas.pixel {
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+button {
+  font: inherit;
+  color: inherit;
+}
+button:focus-visible,
+input:focus-visible {
+  outline: 3px solid var(--track);
+  outline-offset: 2px;
+}
+a {
+  color: inherit;
+}
+
+/* 分段按鈕（動作、表情） */
+.seg {
+  display: inline-flex;
+  flex-wrap: wrap;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 3px;
+}
+.seg button {
+  border: 0;
+  background: transparent;
+  font-weight: 500;
+  padding: 6px 13px;
+  border-radius: 7px;
+  cursor: pointer;
+}
+.seg button[aria-pressed='true'] {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+/* 主要按鈕 */
+.btn {
+  font-weight: 700;
+  border: 0;
+  border-radius: 10px;
+  padding: 9px 18px;
+  background: var(--ink);
+  color: var(--surface);
+  cursor: pointer;
+}
+.btn:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+.btn.ghost {
+  background: transparent;
+  color: var(--ink);
+  border: 1px solid var(--line);
+}
+.muted {
+  color: var(--muted);
+}
