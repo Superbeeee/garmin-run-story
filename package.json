@@ -1,0 +1,29 @@
+{
+  "name": "xmas-runner",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc -b && vite build",
+    "preview": "vite preview",
+    "typecheck": "vue-tsc -b",
+    "build:assets": "tsx scripts/build-assets.ts",
+    "verify:assets": "tsx scripts/verify-assets.ts"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.117.2",
+    "vue": "^3.5.43",
+    "vue-router": "^5.3.1"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.3",
+    "@types/pngjs": "^6.0.5",
+    "@vitejs/plugin-vue": "^6.0.9",
+    "pngjs": "^7.0.0",
+    "tsx": "^4.23.15",
+    "typescript": "^5.9.3",
+    "vite": "^8.3.1",
+    "vue-tsc": "^3.3.11"
+  }
+}
