@@ -1,26 +1,64 @@
+/*
+ * 像素 RPG 風格
+ * 配色取自 Sweetie 16 調色盤：淺色為白天雪景，深色為聖誕夜空（跟隨系統）。
+ */
+@font-face {
+  font-family: 'Cubic 11';
+  src: url('/fonts/Cubic_11.woff2') format('woff2');
+  font-display: swap;
+}
+
 :root {
-  --bg: #eef1f4;
-  --surface: #ffffff;
-  --ink: #17202b;
-  --muted: #5b6675;
-  --line: #d5dbe2;
-  --track: #2f5da8;
-  --accent: #c9ec3c;
-  --accent-ink: #17202b;
-  --danger: #c2332b;
+  /* 固定色 */
+  --outline: #1a1c2c;
+  --red: #b13e53;
+  --red-hi: #ef7d57;
+  --red-lo: #5d275d;
+  --gold: #ffcd75;
+  --gold-lo: #ef7d57;
+  --green: #38b764;
+  --green-lo: #257179;
+  --blue: #3b5dc9;
+  --blue-lo: #29366f;
+  --snow: #f4f4f4;
+
+  /* 主題色（淺色：白天雪景） */
+  --bg: #94b0c2;
+  --bg-mid: #a6c0cf;
+  --bg-hi: #b8cfdd;
+  --panel: #f4f4f4;
+  --panel-2: #dfe6ec;
+  --panel-lo: #b3c3d0;
+  --ink: #1a1c2c;
+  --muted: #566c86;
+  --accent: var(--gold);
+  --accent-ink: #1a1c2c;
+  --track: var(--blue);
+  --danger: #b13e53;
+  --title: #f4f4f4;
   color-scheme: light;
+
+  --px: 4px;
+  /* 天空背景上的文字用完整描邊，淺色、深色模式都清楚 */
+  --text-outline: 2px 0 0 var(--outline), -2px 0 0 var(--outline), 0 2px 0 var(--outline), 0 -2px 0 var(--outline), 2px 2px 0 var(--outline);
+  --font-pixel: 'Cubic 11', 'PingFang TC', 'Microsoft JhengHei', system-ui, sans-serif;
+  --font-text: 'PingFang TC', 'Noto Sans TC', 'Microsoft JhengHei', system-ui, sans-serif;
 }
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #0f151c;
-    --surface: #18212b;
-    --ink: #e7ecf2;
-    --muted: #9aa6b4;
-    --line: #2a3542;
-    --danger: #ff7a70;
+    --bg: #1a1c2c;
+    --bg-mid: #222a4d;
+    --bg-hi: #29366f;
+    --panel: #333c57;
+    --panel-2: #29366f;
+    --panel-lo: #1f2540;
+    --ink: #f4f4f4;
+    --muted: #94b0c2;
+    --danger: #ef7d57;
     color-scheme: dark;
   }
 }
+
 *,
 *::before,
 *::after {
@@ -31,19 +69,86 @@ html {
 }
 body {
   margin: 0;
-  background: var(--bg);
+  min-height: 100vh;
   color: var(--ink);
-  font-family: 'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', system-ui, sans-serif;
-  font-size: 15px;
+  font-family: var(--font-pixel);
+  font-size: 16px;
   line-height: 1.6;
+  -webkit-font-smoothing: none;
   padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px);
+  /* 天空漸層：以三段色帶呈現，像素感 */
+  background: linear-gradient(to bottom, var(--bg-hi) 0 72px, var(--bg-mid) 72px 144px, var(--bg) 144px) fixed;
 }
-h1 {
-  font-size: 28px;
-  font-weight: 700;
-  margin: 0 0 4px;
-  letter-spacing: 0.02em;
+
+/* 飄雪：兩層可無縫重複的像素雪花圖，以不同速度往下捲動 */
+body::before,
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: var(--snow-opacity, 0.85);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240' shape-rendering='crispEdges' fill='%23fff'%3E%3Crect x='20' y='14' width='4' height='4'/%3E%3Crect x='132' y='40' width='4' height='4'/%3E%3Crect x='204' y='96' width='4' height='4'/%3E%3Crect x='64' y='120' width='4' height='4'/%3E%3Crect x='168' y='176' width='4' height='4'/%3E%3Crect x='28' y='204' width='4' height='4'/%3E%3Crect x='104' y='228' width='4' height='4'/%3E%3C/svg%3E");
+  background-size: 240px 240px;
+  animation: snow 16s linear infinite;
 }
+body::after {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180' shape-rendering='crispEdges' fill='%23fff'%3E%3Crect x='40' y='20' width='2' height='2'/%3E%3Crect x='150' y='60' width='2' height='2'/%3E%3Crect x='90' y='100' width='2' height='2'/%3E%3Crect x='10' y='130' width='2' height='2'/%3E%3Crect x='120' y='166' width='2' height='2'/%3E%3C/svg%3E");
+  background-size: 180px 180px;
+  animation: snow-small 24s linear infinite;
+}
+@keyframes snow {
+  to {
+    background-position: 0 240px;
+  }
+}
+@keyframes snow-small {
+  to {
+    background-position: 0 180px;
+  }
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --snow-opacity: 0.45;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  body::before,
+  body::after {
+    animation: none;
+  }
+}
+#app {
+  position: relative;
+  z-index: 1;
+}
+
+h1,
+h2,
+h3 {
+  font-weight: normal;
+}
+
+/* 大標：白字 + 像素描邊 + 紅色落影 */
+.title {
+  font-size: 33px;
+  line-height: 1.25;
+  margin: 0;
+  color: var(--title);
+  letter-spacing: 0.04em;
+  text-shadow:
+    2px 0 0 var(--outline),
+    -2px 0 0 var(--outline),
+    0 2px 0 var(--outline),
+    0 -2px 0 var(--outline),
+    2px 2px 0 var(--outline),
+    -2px -2px 0 var(--outline),
+    2px -2px 0 var(--outline),
+    -2px 2px 0 var(--outline),
+    5px 5px 0 var(--red);
+}
+
 canvas.pixel {
   image-rendering: pixelated;
   image-rendering: crisp-edges;
@@ -52,56 +157,167 @@ button {
   font: inherit;
   color: inherit;
 }
-button:focus-visible,
-input:focus-visible {
-  outline: 3px solid var(--track);
-  outline-offset: 2px;
-}
 a {
   color: inherit;
 }
+button:focus-visible,
+input:focus-visible,
+summary:focus-visible,
+a:focus-visible {
+  outline: 3px dashed var(--gold);
+  outline-offset: 4px;
+}
 
-/* 分段按鈕（動作、表情） */
+/*
+ * 像素視窗：以四向 box-shadow 畫出缺角外框（經典 RPG 對話框），
+ * 內側再加一道亮邊與暗邊做立體感。外框畫在元素外面，所以留 margin。
+ */
+.win {
+  position: relative;
+  background: var(--panel);
+  margin: var(--px);
+  padding: 14px 16px;
+  box-shadow:
+    calc(var(--px) * -1) 0 0 0 var(--outline),
+    var(--px) 0 0 0 var(--outline),
+    0 calc(var(--px) * -1) 0 0 var(--outline),
+    0 var(--px) 0 0 var(--outline),
+    inset var(--px) var(--px) 0 0 var(--panel-2),
+    inset calc(var(--px) * -1) calc(var(--px) * -1) 0 0 var(--panel-lo);
+}
+/* 視窗左上角的標籤 */
+.win-tag {
+  position: absolute;
+  top: -14px;
+  left: 14px;
+  background: var(--red);
+  color: var(--snow);
+  font-size: 14px;
+  line-height: 1;
+  padding: 4px 8px 5px;
+  box-shadow:
+    -2px 0 0 0 var(--outline),
+    2px 0 0 0 var(--outline),
+    0 -2px 0 0 var(--outline),
+    0 2px 0 0 var(--outline);
+}
+
+/* 像素按鈕：按下時下沉 */
+.btn {
+  --btn-bg: var(--red);
+  --btn-hi: var(--red-hi);
+  --btn-lo: var(--red-lo);
+  --btn-ink: var(--snow);
+  display: inline-block;
+  position: relative;
+  border: 0;
+  margin: var(--px);
+  padding: 10px 18px 12px;
+  font-size: 18px;
+  line-height: 1.2;
+  color: var(--btn-ink);
+  background: var(--btn-bg);
+  text-decoration: none;
+  cursor: pointer;
+  box-shadow:
+    calc(var(--px) * -1) 0 0 0 var(--outline),
+    var(--px) 0 0 0 var(--outline),
+    0 calc(var(--px) * -1) 0 0 var(--outline),
+    0 var(--px) 0 0 var(--outline),
+    inset 0 calc(var(--px) * -1) 0 0 var(--btn-lo),
+    inset var(--px) var(--px) 0 0 var(--btn-hi);
+  transition: transform 60ms steps(1);
+}
+.btn:hover {
+  filter: brightness(1.08);
+}
+.btn:active:not(:disabled) {
+  transform: translateY(2px);
+  box-shadow:
+    calc(var(--px) * -1) 0 0 0 var(--outline),
+    var(--px) 0 0 0 var(--outline),
+    0 calc(var(--px) * -1) 0 0 var(--outline),
+    0 var(--px) 0 0 var(--outline),
+    inset 0 2px 0 0 var(--btn-lo);
+}
+.btn:disabled {
+  filter: grayscale(0.7);
+  opacity: 0.7;
+  cursor: default;
+}
+.btn.green {
+  --btn-bg: var(--green);
+  --btn-hi: #a7f070;
+  --btn-lo: var(--green-lo);
+  --btn-ink: var(--outline);
+}
+.btn.ghost {
+  --btn-bg: var(--panel);
+  --btn-hi: var(--panel);
+  --btn-lo: var(--panel-lo);
+  --btn-ink: var(--ink);
+  font-size: 16px;
+  padding: 7px 14px 9px;
+}
+
+/* 分段按鈕列（動作、表情）：一排小像素鍵 */
 .seg {
   display: inline-flex;
   flex-wrap: wrap;
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  padding: 3px;
+  gap: 6px 8px;
+  padding: 2px;
 }
 .seg button {
   border: 0;
-  background: transparent;
-  font-weight: 500;
-  padding: 6px 13px;
-  border-radius: 7px;
+  margin: 2px;
+  padding: 5px 11px 7px;
+  font-size: 15px;
+  line-height: 1.2;
+  background: var(--panel);
+  color: var(--ink);
   cursor: pointer;
+  box-shadow:
+    -2px 0 0 0 var(--outline),
+    2px 0 0 0 var(--outline),
+    0 -2px 0 0 var(--outline),
+    0 2px 0 0 var(--outline),
+    inset 0 -3px 0 0 var(--panel-lo);
+}
+.seg button:active {
+  transform: translateY(2px);
+  box-shadow:
+    -2px 0 0 0 var(--outline),
+    2px 0 0 0 var(--outline),
+    0 -2px 0 0 var(--outline),
+    0 2px 0 0 var(--outline);
 }
 .seg button[aria-pressed='true'] {
   background: var(--accent);
   color: var(--accent-ink);
+  box-shadow:
+    -2px 0 0 0 var(--outline),
+    2px 0 0 0 var(--outline),
+    0 -2px 0 0 var(--outline),
+    0 2px 0 0 var(--outline),
+    inset 0 -3px 0 0 var(--gold-lo);
 }
 
-/* 主要按鈕 */
-.btn {
-  font-weight: 700;
-  border: 0;
-  border-radius: 10px;
-  padding: 9px 18px;
-  background: var(--ink);
-  color: var(--surface);
-  cursor: pointer;
-}
-.btn:disabled {
-  opacity: 0.55;
-  cursor: default;
-}
-.btn.ghost {
-  background: transparent;
-  color: var(--ink);
-  border: 1px solid var(--line);
-}
 .muted {
   color: var(--muted);
+}
+
+/* 閃爍的游標（▶） */
+.cursor {
+  display: inline-block;
+  animation: blink 1s steps(2, start) infinite;
+}
+@keyframes blink {
+  to {
+    visibility: hidden;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cursor {
+    animation: none;
+  }
 }

@@ -61,10 +61,12 @@ const fmt = (iso: string) => new Date(iso).toLocaleString('zh-TW', { month: 'num
     </template>
     <template v-else>
       <header>
-        <h1>報名名單</h1>
-        <p class="muted">
-          <template v-if="state === 'ready'">目前 {{ players.length }} 人報名 · {{ updatedAt }} 更新，每 30 秒自動更新</template>
-          <template v-else-if="state === 'loading'">讀取中…</template>
+        <h1 class="title">報名名單</h1>
+        <p class="status">
+          <template v-if="state === 'ready'">
+            <span class="count">{{ players.length }}</span> 位跑者已報名 · {{ updatedAt }} 更新（每 30 秒自動更新）
+          </template>
+          <template v-else-if="state === 'loading'">讀取中<span class="cursor">…</span></template>
         </p>
         <p v-if="err" class="err" role="alert">{{ err }}</p>
       </header>
@@ -78,9 +80,9 @@ const fmt = (iso: string) => new Date(iso).toLocaleString('zh-TW', { month: 'num
           <button class="btn ghost" type="button" @click="load">立即更新</button>
         </div>
 
-        <p v-if="!players.length" class="muted">還沒有人報名。</p>
+        <p v-if="!players.length" class="win empty">還沒有人報名。</p>
         <ol v-else class="list">
-          <li v-for="p in players" :key="p.id">
+          <li v-for="p in players" :key="p.id" class="win">
             <AvatarPortrait :config="p.avatar" :label="p.name" />
             <div>
               <b>{{ p.name }}</b>
@@ -102,12 +104,24 @@ const fmt = (iso: string) => new Date(iso).toLocaleString('zh-TW', { month: 'num
 header p {
   margin: 0;
 }
+.status {
+  margin-top: 10px !important;
+  color: var(--title);
+  text-shadow: var(--text-outline);
+}
+.count {
+  font-size: 26px;
+  color: var(--gold);
+}
 .err {
-  color: var(--danger);
+  color: var(--gold);
+  text-shadow: var(--text-outline);
   margin-top: 6px !important;
 }
 .stage {
   margin-top: 18px;
+  padding: 6px;
+  background: var(--outline);
 }
 .stage:fullscreen {
   display: flex;
@@ -125,18 +139,18 @@ header p {
   margin: 0;
   padding: 0;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 10px;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 14px;
 }
 .list li {
   display: flex;
   align-items: center;
   gap: 10px;
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: 12px;
   padding: 8px 10px;
   min-width: 0;
+}
+.empty {
+  margin-top: 8px;
 }
 .list canvas {
   width: 40px;
@@ -149,7 +163,7 @@ header p {
   min-width: 0;
 }
 .list b {
-  font-weight: 500;
+  font-weight: normal;
   overflow-wrap: anywhere;
 }
 .list span {

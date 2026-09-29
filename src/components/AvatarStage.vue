@@ -136,30 +136,34 @@ useRafLoop((now, dt) => {
 <template>
   <section class="stage" :class="{ 'mobile-sticky': stickyOnMobile }" aria-label="角色預覽">
     <div class="views">
-      <div class="portrait">
+      <div class="win portrait">
         <canvas ref="portraitEl" class="pixel" :width="PORTRAIT_W" :height="PORTRAIT_H" aria-label="角色正面預覽"></canvas>
       </div>
-      <div class="scene-box">
+      <div class="win scene-box">
         <canvas ref="sceneEl" class="pixel" :width="PREVIEW_W" :height="PREVIEW_H" aria-label="角色動畫預覽"></canvas>
       </div>
     </div>
-    <p v-if="status === 'loading'" class="status muted">素材載入中…</p>
+    <p v-if="status === 'loading'" class="status">素材載入中<span class="cursor">…</span></p>
     <p v-else-if="status === 'error'" class="status err">素材載入失敗，請重新整理頁面。</p>
 
-    <div class="bar">
-      <div class="seg" role="group" aria-label="動作">
-        <button v-for="[a, label] in ACTIONS" :key="a" type="button" :aria-pressed="current === a" @click="act(a)">{{ label }}</button>
+    <div class="win controls">
+      <div class="bar">
+        <span class="bar-label">動作</span>
+        <div class="seg" role="group" aria-label="動作">
+          <button v-for="[a, label] in ACTIONS" :key="a" type="button" :aria-pressed="current === a" @click="act(a)">{{ label }}</button>
+        </div>
+        <label v-if="debug" class="check"><input v-model="slow" type="checkbox" /> 慢動作</label>
       </div>
-      <label v-if="debug" class="check"><input v-model="slow" type="checkbox" /> 慢動作</label>
-    </div>
-    <div class="bar">
-      <div class="seg" role="group" aria-label="表情動作">
-        <button v-for="(e, i) in EMOTES" :key="e.face + e.icon" type="button" aria-pressed="false" @click="fireEmote(i)">{{ e.label }}</button>
+      <div class="bar">
+        <span class="bar-label">表情</span>
+        <div class="seg" role="group" aria-label="表情動作">
+          <button v-for="(e, i) in EMOTES" :key="e.face + e.icon" type="button" aria-pressed="false" @click="fireEmote(i)">{{ e.label }}</button>
+        </div>
       </div>
-      <span class="hint muted">也可以按鍵盤 1～8</span>
+      <p class="hint muted">鍵盤 1～8 也能做表情</p>
     </div>
 
-    <div v-if="debug" class="meta">
+    <div v-if="debug" class="win meta">
       <h2>這一格疊了哪些圖層</h2>
       <div class="now muted">{{ debugInfo.now }}</div>
       <ol>
@@ -175,17 +179,18 @@ useRafLoop((now, dt) => {
 .views {
   display: grid;
   grid-template-columns: minmax(0, 0.42fr) minmax(0, 1fr);
-  gap: 12px;
+  gap: 14px;
   align-items: stretch;
 }
+/* 正面大圖：角色站在一塊小舞台上 */
 .portrait {
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: 14px;
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: center;
-  padding: 8px;
+  padding: 10px 8px 0;
+  background:
+    linear-gradient(to top, var(--panel-lo) 0 10px, var(--panel-2) 10px 14px, transparent 14px),
+    var(--panel);
 }
 .portrait canvas {
   width: 100%;
@@ -193,35 +198,58 @@ useRafLoop((now, dt) => {
   aspect-ratio: 40 / 62;
 }
 .scene-box {
-  background: var(--track);
-  border-radius: 14px;
-  padding: 10px;
   display: flex;
   align-items: center;
+  padding: 6px;
+  background: var(--outline);
+  box-shadow:
+    -4px 0 0 0 var(--outline),
+    4px 0 0 0 var(--outline),
+    0 -4px 0 0 var(--outline),
+    0 4px 0 0 var(--outline);
 }
 .scene-box canvas {
   display: block;
   width: 100%;
   aspect-ratio: 16 / 9;
-  border-radius: 6px;
   background: #cfe2f0;
 }
 .status {
-  font-size: 14px;
-  margin: 8px 0 0;
+  font-size: 15px;
+  margin: 10px 4px 0;
+  color: var(--title);
+  text-shadow: var(--text-outline);
 }
 .err {
-  color: var(--danger);
+  color: var(--gold);
+}
+.controls {
+  margin-top: 18px;
+  padding: 10px 12px;
 }
 .bar {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 6px 10px;
   align-items: center;
-  margin-top: 14px;
+}
+.bar + .bar {
+  margin-top: 8px;
+}
+.bar-label {
+  font-size: 14px;
+  color: var(--muted);
+  min-width: 2.6em;
+}
+.bar-label::before {
+  content: '▶ ';
+  color: var(--red);
+  font-size: 10px;
+  vertical-align: 2px;
 }
 .hint {
   font-size: 13px;
+  margin: 6px 0 0;
 }
 .check {
   display: inline-flex;
@@ -233,15 +261,12 @@ useRafLoop((now, dt) => {
   margin-left: 6px;
 }
 .meta {
-  margin-top: 14px;
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  padding: 12px 14px;
+  margin-top: 18px;
+  font-family: var(--font-text);
 }
 .meta h2 {
-  font-size: 14px;
-  font-weight: 500;
+  font-family: var(--font-pixel);
+  font-size: 15px;
   margin: 0 0 6px;
 }
 .meta .now {
@@ -258,7 +283,7 @@ useRafLoop((now, dt) => {
   display: flex;
   gap: 10px;
   padding: 2px 0;
-  border-top: 1px dashed var(--line);
+  border-top: 1px dashed var(--panel-lo);
 }
 .meta li:first-child {
   border-top: 0;
@@ -295,12 +320,17 @@ useRafLoop((now, dt) => {
     top: env(safe-area-inset-top, 0px);
     z-index: 5;
     grid-template-columns: auto minmax(0, 1fr);
+    gap: 12px;
     background: var(--bg);
-    padding-block: 8px;
-    margin-block: -8px;
+    padding: 10px 4px;
+    margin: -10px -4px;
+    box-shadow: 0 4px 0 0 var(--outline);
   }
   .mobile-sticky .portrait {
-    padding: 6px;
+    padding: 6px 6px 0;
+  }
+  .mobile-sticky .controls {
+    margin-top: 0;
   }
   .mobile-sticky .portrait canvas {
     width: auto;

@@ -4,7 +4,7 @@ import credits from '../assets/credits.json'
 </script>
 
 <template>
-  <footer class="credits">
+  <footer class="win credits">
     <h2>素材來源與授權</h2>
     <p>
       角色素材來自
@@ -31,18 +31,16 @@ import credits from '../assets/credits.json'
 .credits {
   font-size: 13px;
   color: var(--muted);
-  border-top: 1px solid var(--line);
-  padding-top: 16px;
 }
 h2 {
   font-size: 15px;
-  font-weight: 500;
   color: var(--ink);
   margin: 0 0 6px;
 }
 p {
   margin: 0 0 10px;
   max-width: 80ch;
+  font-family: var(--font-text);
 }
 summary {
   cursor: pointer;
@@ -52,6 +50,7 @@ summary {
 ul {
   margin: 10px 0 0;
   padding-left: 18px;
+  font-family: var(--font-text);
   columns: 2;
   column-gap: 28px;
 }

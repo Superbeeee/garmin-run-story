@@ -119,15 +119,20 @@ async function submit() {
 <template>
   <div class="wrap">
     <header>
-      <h1>{{ isEdit ? '修改你的跑者' : '捏一個你的跑者' }}</h1>
-      <p v-if="isEdit" class="muted">改好之後按「儲存修改」，活動當天就會用新的造型登場。</p>
-      <p v-else class="muted">聖誕交換禮物報名：選好造型、填上名字，按下「完成報名」就報名成功了。活動當天會用這個角色一起玩遊戲！</p>
+      <p class="kicker">★ 聖誕交換禮物 ★ 跑者報名 ★</p>
+      <h1 class="title">{{ isEdit ? '修改你的跑者' : '捏一個你的跑者' }}</h1>
+      <div class="win dialog">
+        <p v-if="isEdit">改好之後按「儲存修改」，活動當天就會用新的造型登場。</p>
+        <p v-else>選好造型、填上名字，按下「完成報名」就報名成功了！活動當天會用這個角色一起玩遊戲。</p>
+        <span class="next cursor" aria-hidden="true">▼</span>
+      </div>
     </header>
 
     <AvatarStage class="stage" :config="config" :debug="debug" sticky-on-mobile />
 
-    <section class="panel" aria-label="造型設定">
-      <p v-if="loadState === 'loading'" class="muted loading">讀取你的造型中…</p>
+    <section class="win panel" aria-label="造型設定">
+      <span class="win-tag">造型設定</span>
+      <p v-if="loadState === 'loading'" class="muted loading">讀取你的造型中<span class="cursor">…</span></p>
       <fieldset>
         <legend>性別</legend>
         <OptionChips v-model="gender" :options="GENDERS" label="性別" />
@@ -188,7 +193,7 @@ async function submit() {
       </fieldset>
 
       <form class="signup" novalidate @submit.prevent="submit">
-        <label for="name">你的名字</label>
+        <label for="name">▶ 你的名字</label>
         <div class="row">
           <input
             id="name"
@@ -201,7 +206,7 @@ async function submit() {
             placeholder="例如：Eason"
             :disabled="loadState !== 'ready'"
           />
-          <button class="btn" type="submit" :disabled="busy || loadState !== 'ready'">
+          <button class="btn submit" type="submit" :disabled="busy || loadState !== 'ready'">
             {{ busy ? '送出中…' : isEdit ? '儲存修改' : '完成報名' }}
           </button>
         </div>
@@ -229,72 +234,122 @@ header,
 .full {
   grid-column: 1 / -1;
 }
-header p {
-  margin: 0;
+.kicker {
+  margin: 0 0 6px;
+  font-size: 14px;
+  letter-spacing: 0.08em;
+  color: var(--gold);
+  text-shadow: var(--text-outline);
+}
+/* RPG 對話框 */
+.dialog {
+  margin-top: 18px;
   max-width: 62ch;
+  padding: 12px 34px 12px 16px;
+}
+.dialog p {
+  margin: 0;
+}
+.dialog .next {
+  position: absolute;
+  right: 12px;
+  bottom: 8px;
+  font-size: 12px;
+  color: var(--red);
 }
 .stage {
   position: sticky;
   top: 20px;
 }
 .panel {
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: 14px;
-  padding: 6px 18px 18px;
+  padding: 14px 18px 18px;
 }
 .loading {
-  margin: 12px 0 0;
+  margin: 8px 0 0;
 }
 fieldset {
   border: 0;
   margin: 0;
-  padding: 14px 0 12px;
-  border-bottom: 1px solid var(--line);
+  padding: 14px 0 14px;
+  border-bottom: 2px dashed var(--panel-lo);
   min-width: 0;
 }
 legend {
-  font-weight: 500;
-  font-size: 14px;
+  font-size: 16px;
   padding: 0;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
+}
+legend::before {
+  content: '▶ ';
+  color: var(--red);
+  font-size: 11px;
+  vertical-align: 2px;
 }
 fieldset > :not(legend) + :not(legend) {
   margin-top: 10px;
 }
 .signup {
-  padding-top: 16px;
+  padding-top: 18px;
 }
 .signup label {
   display: block;
-  font-weight: 500;
-  font-size: 14px;
-  margin-bottom: 6px;
+  font-size: 16px;
+  margin-bottom: 8px;
 }
 .row {
   display: flex;
-  gap: 8px;
+  gap: 12px;
+  align-items: center;
 }
+/* 輸入框：內凹的像素框 */
 .row input {
   flex: 1;
   min-width: 0;
+  margin: 4px;
   font: inherit;
   /* iOS 小於 16px 會自動放大畫面 */
-  font-size: 16px;
+  font-size: 18px;
   color: var(--ink);
-  background: var(--bg);
-  border: 1px solid var(--line);
-  border-radius: 10px;
+  background: var(--panel-2);
+  border: 0;
   padding: 9px 12px;
+  box-shadow:
+    -4px 0 0 0 var(--outline),
+    4px 0 0 0 var(--outline),
+    0 -4px 0 0 var(--outline),
+    0 4px 0 0 var(--outline),
+    inset 3px 3px 0 0 var(--panel-lo);
+}
+.row input:focus {
+  outline: none;
+  background: var(--panel);
+  box-shadow:
+    -4px 0 0 0 var(--outline),
+    4px 0 0 0 var(--outline),
+    0 -4px 0 0 var(--outline),
+    0 4px 0 0 var(--outline),
+    inset 3px 3px 0 0 var(--panel-lo),
+    0 0 0 8px var(--gold);
+}
+.row input::placeholder {
+  color: var(--muted);
+}
+.submit {
+  flex: none;
+}
+.submit::before {
+  content: '▶ ';
+  font-size: 13px;
+  vertical-align: 2px;
 }
 .err {
   color: var(--danger);
-  font-size: 13px;
-  margin-top: 6px;
+  font-size: 14px;
+  margin-top: 8px;
   min-height: 1em;
 }
 .ok {
-  font-size: 14px;
+  font-size: 15px;
   margin-top: 6px;
 }
 .cancel {
@@ -305,14 +360,22 @@ fieldset > :not(legend) + :not(legend) {
 @media (max-width: 820px) {
   .wrap {
     grid-template-columns: 1fr;
-    gap: 20px;
+    gap: 22px;
     padding: 20px 16px 40px;
   }
   .stage {
     position: static;
   }
-  h1 {
-    font-size: 24px;
+  .title {
+    font-size: 26px;
+  }
+}
+@media (max-width: 420px) {
+  .row {
+    flex-wrap: wrap;
+  }
+  .submit {
+    flex: 1 1 100%;
   }
 }
 </style>

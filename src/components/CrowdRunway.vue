@@ -154,7 +154,7 @@ useRafLoop((now, dt) => {
   lctx.clearRect(0, 0, lctx.canvas.width, lctx.canvas.height)
   if (!props.showNames) return
   const k = labelScale
-  lctx.font = `500 ${Math.max(11, Math.round(4.2 * k))}px 'Noto Sans TC', 'PingFang TC', system-ui, sans-serif`
+  lctx.font = `${Math.max(12, Math.round(4.4 * k))}px 'Cubic 11', 'PingFang TC', system-ui, sans-serif`
   lctx.textAlign = 'center'
   lctx.textBaseline = 'top'
   lctx.lineJoin = 'round'
@@ -182,7 +182,6 @@ useRafLoop((now, dt) => {
 .crowd {
   position: relative;
   width: 100%;
-  border-radius: 12px;
   overflow: hidden;
   background: var(--track);
 }
