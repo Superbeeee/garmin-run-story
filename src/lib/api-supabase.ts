@@ -1,15 +1,10 @@
-import { createClient, type PostgrestError } from '@supabase/supabase-js'
+import type { PostgrestError } from '@supabase/supabase-js'
 import { parseAvatarConfig } from '../avatar'
-import { ApiError, type Api, type ApiErrorCode, type Player } from './api'
+import type { Api, ApiErrorCode, Player } from './api'
+import { supabase, toApiError as toError } from './supabase'
 
-const KNOWN: ApiErrorCode[] = ['name_taken', 'invalid_name', 'invalid_avatar', 'forbidden']
-
-/** DB function 以錯誤訊息回傳錯誤代碼（見 migration），其餘視為連線問題 */
-function toApiError(e: PostgrestError | Error): ApiError {
-  const code = KNOWN.find((c) => e.message === c)
-  if (!code) console.error('[api]', e)
-  return new ApiError(code ?? 'network', e.message)
-}
+const KNOWN: ApiErrorCode[] = ['name_taken', 'invalid_name', 'invalid_avatar', 'not_signed_in', 'already_registered', 'not_registered']
+const toApiError = (e: PostgrestError | Error) => toError(e, KNOWN)
 
 interface PlayerRow {
   id: string
@@ -25,28 +20,39 @@ function toPlayer(r: PlayerRow): Player | null {
 }
 
 export function createSupabaseApi(): Api {
-  const sb = createClient(import.meta.env.VITE_SUPABASE_URL, import.meta.env.VITE_SUPABASE_ANON_KEY, {
-    auth: { persistSession: false, autoRefreshToken: false },
-  })
+  const sb = supabase()
 
   return {
     kind: 'supabase',
-    async register(name, avatar) {
-      const { data, error } = await sb.rpc('register_player', { p_name: name, p_avatar: avatar }).single<{ id: string; edit_token: string }>()
-      if (error) throw toApiError(error)
-      return { id: data.id, editToken: data.edit_token }
+    async getUser() {
+      const { data } = await sb.auth.getSession()
+      const user = data.session?.user
+      return user ? { email: user.email ?? '' } : null
     },
-    async getMine(id, editToken) {
-      const { data, error } = await sb.rpc('get_my_player', { p_id: id, p_token: editToken }).maybeSingle<PlayerRow>()
-      if (error) {
-        // 本機存的 id/token 格式壞掉時 Postgres 會回 22P02，當成找不到
-        if (error.code === '22P02') return null
-        throw toApiError(error)
-      }
+    async signIn(path) {
+      const redirectTo = new URL(import.meta.env.BASE_URL.replace(/\/$/, '') + path, location.origin).href
+      const { error } = await sb.auth.signInWithOAuth({
+        provider: 'google',
+        // 有多個 Google 帳號時讓使用者選
+        options: { redirectTo, queryParams: { prompt: 'select_account' } },
+      })
+      if (error) throw toApiError(error)
+    },
+    async signOut() {
+      await sb.auth.signOut()
+    },
+    async register(name, avatar) {
+      const { error } = await sb.rpc('register_player', { p_name: name, p_avatar: avatar })
+      if (error) throw toApiError(error)
+    },
+    async getMine() {
+      if (!(await this.getUser())) return null
+      const { data, error } = await sb.rpc('get_my_player').maybeSingle<PlayerRow>()
+      if (error) throw toApiError(error)
       return data ? toPlayer(data) : null
     },
-    async update(id, editToken, name, avatar) {
-      const { error } = await sb.rpc('update_player', { p_id: id, p_token: editToken, p_name: name, p_avatar: avatar })
+    async update(name, avatar) {
+      const { error } = await sb.rpc('update_player', { p_name: name, p_avatar: avatar })
       if (error) throw toApiError(error)
     },
     async list() {

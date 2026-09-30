@@ -306,6 +306,15 @@ a:focus-visible {
   color: var(--muted);
 }
 
+/* 看起來像連結的按鈕 */
+.linklike {
+  background: none;
+  border: 0;
+  padding: 0;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
 /* 閃爍的游標（▶） */
 .cursor {
   display: inline-block;
