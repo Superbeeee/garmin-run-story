@@ -44,6 +44,9 @@ await db.exec(`
     as $$ select coalesce(nullif(current_setting('request.jwt.claims', true), ''), '{}')::jsonb $$;
   grant usage on schema auth to anon, authenticated;
   create publication supabase_realtime;
+  -- 比照 Supabase：新建的資料表與 function 預設直接授權給 anon、authenticated（不是透過 PUBLIC）
+  alter default privileges in schema public grant all on tables to anon, authenticated;
+  alter default privileges in schema public grant execute on functions to anon, authenticated;
 `)
 for (const f of readdirSync(MIGRATIONS).filter((f) => f.endsWith('.sql')).sort()) {
   await db.exec(readFileSync(join(MIGRATIONS, f), 'utf8'))
@@ -67,8 +70,12 @@ const register = 'select public.register_player($1, $2) as id'
 await as(null)
 await expectError(db, '未登入不能報名', register, ['路人', avatar], /permission denied/)
 await expectError(db, '未登入不能取回資料', 'select * from public.get_my_player()', [], /permission denied/)
+await expectError(db, '未登入不能呼叫 is_admin', 'select public.is_admin()', [], /permission denied/)
 await db.exec('reset role; set role authenticated')
 await expectError(db, 'authenticated 但沒有 uid', register, ['路人', avatar], /not_signed_in/)
+for (const fn of ['require_uid()', 'require_admin()', 'my_player_id()', 'draw_sync()']) {
+  await expectError(db, `登入者不能直接呼叫 ${fn}`, `select public.${fn}`, [], /permission denied/)
+}
 
 // 報名
 await as(alice)
