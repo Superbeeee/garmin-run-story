@@ -5,8 +5,8 @@
  */
 import { computed, onBeforeUnmount, onMounted, ref, shallowRef } from 'vue'
 import { useRoute } from 'vue-router'
-import AvatarPortrait from '../components/AvatarPortrait.vue'
 import CrowdRunway, { type Runner } from '../components/CrowdRunway.vue'
+import PlayerGrid from '../components/PlayerGrid.vue'
 import { ApiError, ERROR_TEXT, getApi, type Player } from '../lib/api'
 
 const REFRESH_MS = 30_000
@@ -49,8 +49,6 @@ const stageEl = ref<HTMLElement>()
 function fullscreen() {
   stageEl.value?.requestFullscreen?.().catch(() => {})
 }
-
-const fmt = (iso: string) => new Date(iso).toLocaleString('zh-TW', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' })
 </script>
 
 <template>
@@ -80,16 +78,7 @@ const fmt = (iso: string) => new Date(iso).toLocaleString('zh-TW', { month: 'num
           <button class="btn ghost" type="button" @click="load">立即更新</button>
         </div>
 
-        <p v-if="!players.length" class="win empty">還沒有人報名。</p>
-        <ol v-else class="list">
-          <li v-for="p in players" :key="p.id" class="win">
-            <AvatarPortrait :config="p.avatar" :label="p.name" />
-            <div>
-              <b>{{ p.name }}</b>
-              <span class="muted">{{ fmt(p.createdAt) }}</span>
-            </div>
-          </li>
-        </ol>
+        <PlayerGrid :players="players" show-time />
       </template>
     </template>
   </main>
@@ -133,41 +122,6 @@ header p {
   display: flex;
   gap: 8px;
   margin: 12px 0 24px;
-}
-.list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-  gap: 14px;
-}
-.list li {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 8px 10px;
-  min-width: 0;
-}
-.empty {
-  margin-top: 8px;
-}
-.list canvas {
-  width: 40px;
-  height: 62px;
-  flex: none;
-}
-.list div {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-}
-.list b {
-  font-weight: normal;
-  overflow-wrap: anywhere;
-}
-.list span {
-  font-size: 12px;
 }
 @media (max-width: 520px) {
   .wrap {

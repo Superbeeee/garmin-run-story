@@ -1,6 +1,7 @@
 <script setup lang="ts">
 /**
  * 報名頁（mode = new）與修改造型頁（mode = edit）。
+ * 進到這頁時已經登入（見 router 的 stage）；一個帳號只能報名一次。
  */
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
@@ -29,9 +30,9 @@ import AvatarStage from '../components/AvatarStage.vue'
 import ColorSwatches from '../components/ColorSwatches.vue'
 import CreditsFooter from '../components/CreditsFooter.vue'
 import OptionChips from '../components/OptionChips.vue'
-import { ApiError, ERROR_TEXT, getApi } from '../lib/api'
+import { ApiError, ERROR_TEXT, getApi, type User } from '../lib/api'
 import { NAME_MAX, nameError, normalizeName } from '../lib/name'
-import { clearDraft, getDraft, getRegistration, saveDraft, saveRegistration } from '../lib/registration'
+import { clearDraft, getDraft, saveDraft } from '../lib/registration'
 
 const props = defineProps<{ mode: 'new' | 'edit' }>()
 const route = useRoute()
@@ -43,8 +44,8 @@ const draft = isEdit.value ? null : getDraft()
 const config = ref<AvatarConfig>(draft?.config ?? { ...DEFAULT_CONFIG })
 const name = ref(draft?.name ?? '')
 const err = ref('')
-const ok = ref('')
 const busy = ref(false)
+const user = ref<User | null>(null)
 /** 修改模式：先向後端取回原本的資料 */
 const loadState = ref<'loading' | 'ready' | 'error'>(isEdit.value ? 'loading' : 'ready')
 
@@ -54,12 +55,12 @@ const gender = computed({
 })
 
 onMounted(async () => {
+  const api = await getApi()
+  user.value = await api.getUser()
   if (!isEdit.value) return
-  const reg = getRegistration()
-  if (!reg) return router.replace('/')
   try {
-    const me = await (await getApi()).getMine(reg.id, reg.editToken)
-    if (!me) throw new ApiError('forbidden')
+    const me = await api.getMine()
+    if (!me) return router.replace('/')
     config.value = { ...me.avatar }
     name.value = me.name
     loadState.value = 'ready'
@@ -85,7 +86,6 @@ async function submit() {
   const e = nameError(n)
   if (e) {
     err.value = e
-    ok.value = ''
     nameInput.value?.focus()
     return
   }
@@ -95,24 +95,23 @@ async function submit() {
     const api = await getApi()
     const avatar = { ...config.value }
     if (isEdit.value) {
-      const reg = getRegistration()
-      if (!reg) throw new ApiError('forbidden')
-      await api.update(reg.id, reg.editToken, n, avatar)
-      saveRegistration({ ...reg, name: n })
-    } else {
-      const { id, editToken } = await api.register(n, avatar)
-      clearDraft()
-      if (!saveRegistration({ id, editToken, name: n })) {
-        ok.value = `報名成功：${n}！不過這個瀏覽器無法儲存資料（可能是私密瀏覽模式），之後將無法修改造型。`
-        return
-      }
+      await api.update(n, avatar)
+      return router.push('/lobby')
     }
-    router.push('/done')
+    await api.register(n, avatar)
+    clearDraft()
+    return router.push({ name: 'lobby', query: { joined: '1' } })
   } catch (e) {
+    if (e instanceof ApiError && e.code === 'already_registered') return router.push('/lobby')
+    if (e instanceof ApiError && e.code === 'not_signed_in') return router.replace('/login')
     err.value = e instanceof ApiError ? ERROR_TEXT[e.code] : ERROR_TEXT.network
-  } finally {
-    busy.value = false
   }
+  busy.value = false
+}
+
+async function signOut() {
+  await (await getApi()).signOut()
+  router.replace('/login')
 }
 </script>
 
@@ -123,7 +122,7 @@ async function submit() {
       <h1 class="title">{{ isEdit ? '修改你的跑者' : '捏一個你的跑者' }}</h1>
       <div class="win dialog">
         <p v-if="isEdit">改好之後按「儲存修改」，活動當天就會用新的造型登場。</p>
-        <p v-else>選好造型、填上名字，按下「完成報名」就報名成功了！活動當天會用這個角色一起玩遊戲。</p>
+        <p v-else>選好造型、填上名字，按下「完成報名」就報名成功了！活動當天會用這個角色一起玩遊戲，之後用同一個帳號登入就能修改。</p>
         <span class="next cursor" aria-hidden="true">▼</span>
       </div>
     </header>
@@ -211,8 +210,10 @@ async function submit() {
           </button>
         </div>
         <div class="err" role="alert">{{ err }}</div>
-        <div class="ok" aria-live="polite">{{ ok }}</div>
-        <RouterLink v-if="isEdit" to="/done" class="cancel muted">取消，回到我的角色</RouterLink>
+        <p v-if="user" class="account muted">
+          已用 {{ user.email }} 登入<template v-if="!isEdit"> · <button type="button" class="linklike" @click="signOut">換帳號</button></template>
+        </p>
+        <RouterLink v-if="isEdit" to="/lobby" class="cancel muted">取消，回到大廳</RouterLink>
       </form>
     </section>
 
@@ -348,9 +349,10 @@ fieldset > :not(legend) + :not(legend) {
   margin-top: 8px;
   min-height: 1em;
 }
-.ok {
-  font-size: 15px;
-  margin-top: 6px;
+.account {
+  margin: 6px 0 0;
+  font-size: 14px;
+  overflow-wrap: anywhere;
 }
 .cancel {
   display: inline-block;
