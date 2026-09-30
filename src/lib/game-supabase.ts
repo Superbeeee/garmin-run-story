@@ -177,5 +177,6 @@ export function createSupabaseGameApi(): GameApi {
     next: (id) => call('next_question', { p_game: id }),
     reveal: (id) => call('reveal_question', { p_game: id }),
     finish: (id) => call('finish_game', { p_game: id }),
+    deleteGame: (id) => call('delete_game', { p_game: id }),
   }
 }

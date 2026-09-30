@@ -95,6 +95,8 @@ export interface GameApi {
   next(id: string): Promise<void>
   reveal(id: string): Promise<void>
   finish(id: string): Promise<void>
+  /** 刪除已結束的場次（連同參加者與作答紀錄）；進行中的丟出 invalid_state */
+  deleteGame(id: string): Promise<void>
 }
 
 /** 答案區：把 0～1 的位置平均分成 n 區 */

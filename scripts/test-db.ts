@@ -228,6 +228,28 @@ check('結束後代碼可以重用', !!game2 && game2 !== game)
 await q('select public.finish_game($1)', [game2])
 check('主持人可提早結束場次', (await q('select status from public.games where id = $1', [game2])).rows[0].status === 'finished')
 
+// 刪除場次
+const game3 = (await q(`select public.create_game('DEL1') as id`)).rows[0].id as string
+await expectError(db, '進行中的場次不能刪除', 'select public.delete_game($1)', [game3], /invalid_state/)
+await q('select public.finish_game($1)', [game3])
+await as(bob)
+await expectError(db, '非主持人不能刪除場次', 'select public.delete_game($1)', [game3], /forbidden/)
+await db.exec('reset role')
+const answersBefore = (await db.query<{ n: number }>('select count(*)::int as n from public.game_answers where game_id = $1', [game])).rows[0].n
+await as(host)
+await q('select public.delete_game($1)', [game])
+const gamesLeft = (await q('select id from public.games where id = $1', [game])).rows.length
+check('主持人可刪除已結束的場次', gamesLeft === 0)
+await db.exec('reset role')
+const orphans = (await db.query<{ p: number; a: number }>(
+  'select (select count(*)::int from public.game_players where game_id = $1) as p, (select count(*)::int from public.game_answers where game_id = $1) as a',
+  [game],
+)).rows[0]
+check('參加者與作答紀錄一併刪除', orphans.p === 0 && orphans.a === 0, `刪除前作答 ${answersBefore} 筆`)
+await as(host)
+await expectError(db, '刪除不存在的場次', 'select public.delete_game($1)', [game], /game_not_found/)
+await q('select public.delete_game($1)', [game3])
+
 // ================= 接力抽禮物 =================
 await as(bob)
 await expectError(db, '非主持人不能看籤池', 'select * from public.draw_pool()', [], /forbidden/)

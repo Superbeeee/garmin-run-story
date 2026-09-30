@@ -9,7 +9,7 @@
 import { ApiError } from './api'
 import { mockMyPlayer, mockPlayers } from './api-mock'
 import { isGameAction, type GameAction, type GameApi, type GameState, type Question } from './game'
-import { readJson, writeJson } from './storage'
+import { readJson, removeKey, writeJson } from './storage'
 
 const PREFIX = 'xmas-runner:mock-game:'
 const QUESTIONS = `${PREFIX}questions`
@@ -251,6 +251,21 @@ export function createMockGameApi(): GameApi {
       updateGame(id, (g) => {
         g.status = 'finished'
       })
+    },
+    async deleteGame(id) {
+      await delay()
+      const games = loadGames()
+      const g = games.list.find((x) => x.id === id)
+      if (!g) throw new ApiError('game_not_found')
+      if (g.status !== 'finished') throw new ApiError('invalid_state')
+      // 一併清掉這個場次的加入紀錄與作答
+      for (const { playerId } of joinedIds(id)) {
+        removeKey(joinedKey(id, playerId))
+        removeKey(answerKey(id, playerId))
+      }
+      games.list = games.list.filter((x) => x.id !== id)
+      games.v++
+      writeJson(GAMES, games)
     },
   }
 }

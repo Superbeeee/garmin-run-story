@@ -115,7 +115,7 @@ Supabase 免費專案 7 天沒有使用會自動暫停。`.github/workflows/supa
 - `players`：`id`、`name`（不分大小寫唯一、1～20 字）、`avatar`（AvatarConfig JSON）、`user_id`（`auth.users`，唯一；刪除帳號會一併刪除角色）、`created_at`、`updated_at`
 - 任何人只能讀 `id, name, avatar, created_at`，讀不到 `user_id`，也不能直接寫入
 - 報名、取回、修改透過 `register_player`、`get_my_player`、`update_player`，只開放給已登入的使用者，以 `auth.uid()` 找自己的那筆
-- 搶答跑位：`admins`、`quiz_questions`、`games`、`game_players`、`game_answers`，說明見 `supabase/migrations/20261010000000_quiz_game.sql` 開頭
+- 搶答跑位：`admins`、`quiz_questions`、`games`、`game_players`、`game_answers`，說明見 `supabase/migrations/20261010000000_quiz_game.sql` 開頭；已結束的場次可在主持後台刪除（`delete_game`，連同參加者與作答紀錄）
 - 接力抽禮物：`draw_entries`、`draw_state`，說明見 `supabase/migrations/20261015000000_gift_draw.sql` 開頭
 - `pnpm test:db` 用 PGlite 跑所有 migration 並測試權限與 function
 - 寫入一律透過 function：`register_player`、`get_my_player`、`update_player`（驗證 edit_token）

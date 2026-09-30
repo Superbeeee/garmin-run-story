@@ -212,6 +212,27 @@ const code = ref('')
 const gameErr = ref('')
 const activeGames = computed(() => games.value.filter((g) => g.status !== 'finished'))
 const pastGames = computed(() => games.value.filter((g) => g.status === 'finished').slice(0, 5))
+const confirmGameDelete = ref<string | null>(null)
+
+/** 刪除已結束的場次；按兩次才刪除 */
+async function deleteGame(g: GameState) {
+  if (!gapi) return
+  if (confirmGameDelete.value !== g.id) {
+    confirmGameDelete.value = g.id
+    setTimeout(() => {
+      if (confirmGameDelete.value === g.id) confirmGameDelete.value = null
+    }, 4000)
+    return
+  }
+  confirmGameDelete.value = null
+  gameErr.value = ''
+  try {
+    await gapi.deleteGame(g.id)
+    games.value = games.value.filter((x) => x.id !== g.id)
+  } catch (e) {
+    gameErr.value = message(e)
+  }
+}
 
 async function createGame() {
   if (!gapi) return
@@ -256,7 +277,10 @@ async function createGame() {
             <b class="gcode">{{ g.code }}</b>
             <span class="muted">{{ STATUS_TEXT[g.status] }}<template v-if="g.qIndex >= 0 && g.status !== 'finished'">（第 {{ g.qIndex + 1 }}/{{ g.qTotal }} 題）</template></span>
             <RouterLink v-if="g.status !== 'finished'" class="btn ghost small" :to="{ name: 'host-game', params: { id: g.id } }">開啟主持畫面</RouterLink>
-            <RouterLink v-else class="small" :to="{ name: 'host-game', params: { id: g.id } }">看排名</RouterLink>
+            <template v-else>
+              <RouterLink class="small" :to="{ name: 'host-game', params: { id: g.id } }">看排名</RouterLink>
+              <button class="btn ghost small" type="button" @click="deleteGame(g)">{{ confirmGameDelete === g.id ? '確定刪除？' : '刪除' }}</button>
+            </template>
           </li>
         </ul>
       </section>
