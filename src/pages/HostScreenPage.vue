@@ -7,10 +7,14 @@ import { computed, onBeforeUnmount, onMounted, ref, shallowRef, watch } from 'vu
 import LeaderBoard from '../components/LeaderBoard.vue'
 import QuizArena from '../components/QuizArena.vue'
 import { useCountdown } from '../composables/useCountdown'
+import { useWakeLock } from '../composables/useWakeLock'
 import { ApiError, ERROR_TEXT } from '../lib/api'
 import { getGameApi, zoneOf, type GameApi, type GamePlayer, type GameState, type LeaderRow } from '../lib/game'
 
 const props = defineProps<{ id: string }>()
+
+// 投影中螢幕不要自動休眠
+useWakeLock()
 
 let gapi: GameApi | null = null
 const load = ref<'loading' | 'ready' | 'forbidden' | 'missing' | 'error'>('loading')

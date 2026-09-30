@@ -3,7 +3,7 @@ import { parseAvatarConfig } from '../avatar'
 import type { Api, ApiErrorCode, Player } from './api'
 import { supabase, toApiError as toError } from './supabase'
 
-const KNOWN: ApiErrorCode[] = ['name_taken', 'invalid_name', 'invalid_avatar', 'not_signed_in', 'already_registered', 'not_registered']
+const KNOWN: ApiErrorCode[] = ['name_taken', 'invalid_name', 'invalid_avatar', 'not_signed_in', 'already_registered', 'not_registered', 'forbidden']
 const toApiError = (e: PostgrestError | Error) => toError(e, KNOWN)
 
 interface PlayerRow {
@@ -53,6 +53,22 @@ export function createSupabaseApi(): Api {
     },
     async update(name, avatar) {
       const { error } = await sb.rpc('update_player', { p_name: name, p_avatar: avatar })
+      if (error) throw toApiError(error)
+    },
+    async adminPlayers() {
+      const { data, error } = await sb.rpc('admin_players')
+      if (error) throw toApiError(error)
+      return (data as (PlayerRow & { email: string | null })[]).flatMap((r) => {
+        const p = toPlayer(r)
+        return p ? [{ ...p, email: r.email ?? '' }] : []
+      })
+    },
+    async adminRename(id, name) {
+      const { error } = await sb.rpc('admin_rename_player', { p_id: id, p_name: name })
+      if (error) throw toApiError(error)
+    },
+    async adminDelete(id) {
+      const { error } = await sb.rpc('admin_delete_player', { p_id: id })
       if (error) throw toApiError(error)
     },
     async list() {

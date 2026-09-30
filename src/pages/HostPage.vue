@@ -4,7 +4,7 @@ import { computed, onMounted, ref, shallowRef } from 'vue'
 import { useRouter } from 'vue-router'
 import { DEFAULT_CONFIG } from '../avatar'
 import AvatarPortrait from '../components/AvatarPortrait.vue'
-import { ApiError, ERROR_TEXT } from '../lib/api'
+import { ApiError, ERROR_TEXT, getApi, type Api, type Player } from '../lib/api'
 import { getDrawApi, type DrawApi, type DrawEntry } from '../lib/draw'
 import { getGameApi, type GameApi, type GameState, type Question, type QuestionInput } from '../lib/game'
 
@@ -23,6 +23,49 @@ const message = (e: unknown) => (e instanceof ApiError ? ERROR_TEXT[e.code] : ER
 async function refresh() {
   if (!gapi) return
   ;[questions.value, games.value] = await Promise.all([gapi.listQuestions(), gapi.listGames()])
+}
+
+// ---------- 報名管理 ----------
+let api: Api | null = null
+const regs = shallowRef<(Player & { email: string })[]>([])
+const regErr = ref('')
+const renaming = ref<{ id: string; name: string } | null>(null)
+const confirmDelete = ref<string | null>(null)
+const fmtDate = (iso: string) => new Date(iso).toLocaleString('zh-TW', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' })
+
+async function refreshRegs() {
+  if (api) regs.value = await api.adminPlayers()
+}
+async function saveRename() {
+  const r = renaming.value
+  if (!api || !r) return
+  regErr.value = ''
+  try {
+    await api.adminRename(r.id, r.name)
+    renaming.value = null
+    await Promise.all([refreshRegs(), refreshPool()])
+  } catch (e) {
+    regErr.value = message(e)
+  }
+}
+/** 按兩次才刪除 */
+async function removePlayer(p: Player) {
+  if (!api) return
+  if (confirmDelete.value !== p.id) {
+    confirmDelete.value = p.id
+    setTimeout(() => {
+      if (confirmDelete.value === p.id) confirmDelete.value = null
+    }, 4000)
+    return
+  }
+  confirmDelete.value = null
+  regErr.value = ''
+  try {
+    await api.adminDelete(p.id)
+    await Promise.all([refreshRegs(), refreshPool()])
+  } catch (e) {
+    regErr.value = message(e)
+  }
 }
 
 // ---------- 接力抽禮物：籤池 ----------
@@ -70,7 +113,8 @@ onMounted(async () => {
       return
     }
     dapi = await getDrawApi()
-    await Promise.all([refresh(), refreshPool()])
+    api = await getApi()
+    await Promise.all([refresh(), refreshPool(), refreshRegs()])
     state.value = 'ready'
   } catch (e) {
     err.value = message(e)
@@ -308,6 +352,32 @@ async function createGame() {
         </div>
       </section>
 
+      <!-- 報名管理 -->
+      <section class="win box">
+        <span class="win-tag">報名管理（{{ regs.length }} 人）</span>
+        <p class="hint muted">刪除會一併移出遊戲紀錄與籤池；本人之後可以用同一個 Google 帳號重新報名。</p>
+        <p class="err" role="alert">{{ regErr }}</p>
+        <ul class="regs">
+          <li v-for="p in regs" :key="p.id">
+            <AvatarPortrait :config="p.avatar" :label="p.name" />
+            <form v-if="renaming?.id === p.id" class="rename" novalidate @submit.prevent="saveRename">
+              <input v-model="renaming.name" class="field" maxlength="30" aria-label="新名字" />
+              <button class="btn small" type="submit">儲存</button>
+              <button class="btn ghost small" type="button" @click="renaming = null">取消</button>
+            </form>
+            <div v-else class="reg">
+              <b>{{ p.name }}</b>
+              <span class="muted">{{ p.email || '（沒有 email）' }} · {{ fmtDate(p.createdAt) }}</span>
+            </div>
+            <div v-if="renaming?.id !== p.id" class="ops">
+              <button class="btn ghost small" type="button" @click="(renaming = { id: p.id, name: p.name }), (regErr = '')">改名</button>
+              <button class="btn ghost small" type="button" @click="removePlayer(p)">{{ confirmDelete === p.id ? '確定刪除？' : '刪除' }}</button>
+            </div>
+          </li>
+        </ul>
+        <p v-if="!regs.length" class="muted">還沒有人報名。</p>
+      </section>
+
       <RouterLink to="/lobby" class="back">← 回到大廳</RouterLink>
     </template>
   </main>
@@ -537,6 +607,48 @@ legend {
 }
 .reset {
   margin-top: 12px;
+}
+.regs {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.regs li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 0;
+  border-bottom: 2px dashed var(--panel-lo);
+}
+.regs canvas {
+  width: 26px;
+  height: 40px;
+  flex: none;
+}
+.reg {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+.reg b {
+  font-weight: normal;
+  overflow-wrap: anywhere;
+}
+.reg .muted {
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+.rename {
+  flex: 1;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.rename .field {
+  flex: 1;
+  min-width: 8em;
 }
 @media (max-width: 560px) {
   .questions li {

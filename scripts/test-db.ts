@@ -37,7 +37,7 @@ await db.exec(`
   create role anon nologin; create role authenticated nologin;
   grant usage on schema public to anon, authenticated;
   create schema auth;
-  create table auth.users (id uuid primary key);
+  create table auth.users (id uuid primary key, email text);
   create function auth.uid() returns uuid language sql stable
     as $$ select nullif(current_setting('request.jwt.claim.sub', true), '')::uuid $$;
   create function auth.jwt() returns jsonb language sql stable
@@ -51,8 +51,8 @@ for (const f of readdirSync(MIGRATIONS).filter((f) => f.endsWith('.sql')).sort()
 }
 
 const [alice, bob, carol, dave, host] = ['a', 'b', 'c', 'd', 'e'].map((c) => `00000000-0000-0000-0000-00000000000${c}`)
-await db.exec(`insert into auth.users (id) values ('${alice}'), ('${bob}'), ('${carol}'), ('${dave}'), ('${host}')`)
 const emailOf = (uid: string) => `${uid.slice(-1)}@example.com`
+for (const u of [alice, bob, carol, dave, host]) await db.query('insert into auth.users (id, email) values ($1, $2)', [u, emailOf(u)])
 
 /** 切換成某個已登入的使用者；null 表示未登入（anon） */
 async function as(uid: string | null) {
@@ -262,6 +262,24 @@ await q('select public.draw_reset()')
 const afterReset = (await q('select * from public.draw_pool()')).rows
 check('重設後全部回到籤池、手動名字已刪除、排除保留', afterReset.length === 3 && afterReset.every((r) => r.draw_order === null) && afterReset.find((r) => r.id === excludedId)?.excluded === true)
 check('重設後最新結果清空', (await q('select entry_id from public.draw_state')).rows[0].entry_id === null)
+
+// ================= 報名管理 =================
+await as(bob)
+await expectError(db, '非主持人不能看報名管理', 'select * from public.admin_players()', [], /forbidden/)
+await expectError(db, '非主持人不能改名', 'select public.admin_rename_player(gen_random_uuid(), $1)', ['x'], /forbidden/)
+await expectError(db, '非主持人不能刪除', 'select public.admin_delete_player(gen_random_uuid())', [], /forbidden/)
+await as(host)
+const regs = (await q('select * from public.admin_players()')).rows
+check('主持人看得到所有報名與 email', regs.length === 3 && regs.every((r) => typeof r.email === 'string' && (r.email as string).endsWith('@example.com')), JSON.stringify(regs.map((r) => [r.name, r.email])))
+const carolRow = regs.find((r) => r.email === emailOf(carol))!
+await expectError(db, '改成別人的名字', 'select public.admin_rename_player($1, $2)', [carolRow.id, '二'.repeat(20)], /name_taken/)
+await expectError(db, '改成空白', 'select public.admin_rename_player($1, $2)', [carolRow.id, '  '], /invalid_name/)
+await q('select public.admin_rename_player($1, $2)', [carolRow.id, '  帽子 人 '])
+check('主持人可以改名（正規化）', (await q('select name from public.players where id = $1', [carolRow.id])).rows[0]?.name === '帽子 人')
+await q('select public.admin_delete_player($1)', [carolRow.id])
+check('刪除角色後一併移出遊戲紀錄與籤池', (await q('select 1 from public.game_players where player_id = $1', [carolRow.id])).rows.length === 0 && (await q('select * from public.draw_pool()')).rows.every((r) => r.player_id !== carolRow.id))
+await as(carol)
+check('被刪除的人可以用同一個帳號重新報名', !!(await q(`select public.register_player('重新報名', $1) as id`, [avatar])).rows[0].id)
 
 // 刪除帳號時連帶刪除角色
 await db.exec('reset role')

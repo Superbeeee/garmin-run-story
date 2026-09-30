@@ -16,7 +16,7 @@
 | `/edit` | 修改自己的角色（需已報名） |
 | `/play` | 活動專區：輸入遊戲代碼（需已報名） |
 | `/play/:id` | 手機遊戲畫面：看題目、按住左右鍵移動角色作答、結算排名 |
-| `/host` | 主持後台：編輯題庫、建立場次（需為主持人） |
+| `/host` | 主持後台：題庫與場次、籤池、報名管理（改名、刪除）（需為主持人） |
 | `/host/:id` | 主持畫面（投影用）：代碼、題目、倒數、所有人的角色；主持人在這裡按下一題 |
 | `/host/draw` | 接力抽禮物的拉霸機（投影用） |
 | `/roster?key=…` | 管理用名單，所有角色在跑道上跑；`key` 需等於 `VITE_ROSTER_KEY` |
@@ -80,6 +80,10 @@ pnpm verify:assets  # 與 reference/ 的原型逐像素比對
 insert into public.admins (email) values ('you@gmail.com');  -- 需小寫
 ```
 
+### 避免免費專案被暫停
+
+Supabase 免費專案 7 天沒有使用會自動暫停。`.github/workflows/supabase-keepalive.yml` 每天查一次公開的角色名單讓專案保持使用中，需要在 GitHub repo 的 Settings → Secrets and variables → Actions 設定 `SUPABASE_URL` 與 `SUPABASE_ANON_KEY`（與前端相同的公開 key）。活動前一天仍建議到 Supabase Dashboard 確認專案狀態。
+
 ## 遊戲：搶答跑位
 
 1. 主持人在 `/host` 編輯題庫（是非題或 2～4 選項的選擇題，可設作答秒數），輸入代碼建立場次，開啟主持畫面投影。
@@ -91,6 +95,7 @@ insert into public.admins (email) values ('you@gmail.com');  -- 需小寫
 
 - 場次狀態存在 `games`，用 Realtime（postgres_changes）推送；正確答案存在只有主持人能讀的 `quiz_questions`，公布時才寫入 `games.q_answer`。
 - 玩家換區時呼叫 `set_answer`，伺服器只收截止前的最後一次（寬限 1 秒），公布答案時計分。
+- 遊戲中與投影畫面會要求螢幕保持常亮（Screen Wake Lock API，不支援的瀏覽器略過）。
 - 角色位置與跳躍、表情走 Realtime broadcast：手機以 REST 送出（移動時每 400ms、停著每 5 秒），只有主持畫面訂閱，避免每支手機都收到所有人的位置。Supabase 免費方案的 Realtime 有訊息量與連線數上限，人數很多時留意用量。
 
 ## 遊戲：接力抽禮物

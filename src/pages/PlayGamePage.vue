@@ -10,11 +10,15 @@ import LeaderBoard from '../components/LeaderBoard.vue'
 import QuizArena from '../components/QuizArena.vue'
 import { useCountdown } from '../composables/useCountdown'
 import { useRafLoop } from '../composables/useRafLoop'
+import { useWakeLock } from '../composables/useWakeLock'
 import { ApiError, ERROR_TEXT, getApi } from '../lib/api'
 import { getGameApi, zoneOf, type GameAction, type GameApi, type GamePlayer, type GameState, type LeaderRow } from '../lib/game'
 import { readJson, writeJson } from '../lib/storage'
 
 const props = defineProps<{ id: string }>()
+
+// 遊戲中螢幕不要自動休眠
+useWakeLock()
 
 /** 從最左到最右約 2 秒 */
 const SPEED = 0.0005

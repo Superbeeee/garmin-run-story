@@ -10,10 +10,14 @@ import AvatarPortrait from '../components/AvatarPortrait.vue'
 import ConfettiLayer from '../components/ConfettiLayer.vue'
 import JumpingAvatar from '../components/JumpingAvatar.vue'
 import { useRafLoop } from '../composables/useRafLoop'
+import { useWakeLock } from '../composables/useWakeLock'
 import { ApiError, ERROR_TEXT } from '../lib/api'
 import { getDrawApi, type DrawApi, type DrawEntry, type DrawResult } from '../lib/draw'
 import { getGameApi } from '../lib/game'
 import { isMuted, setMuted, sfxDrum, sfxFanfare, sfxFinale, sfxLever, sfxTick } from '../lib/sfx'
+
+// 投影中螢幕不要自動休眠
+useWakeLock()
 
 /** 滾輪動畫總長（含最後回彈） */
 const SPIN_MS = 6500

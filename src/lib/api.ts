@@ -57,6 +57,13 @@ export interface Api {
   update(name: string, avatar: AvatarConfig): Promise<void>
   /** 所有已報名角色（公開資料：名字與造型） */
   list(): Promise<Player[]>
+
+  // 主持人：報名管理
+  /** 所有報名與登入的 email */
+  adminPlayers(): Promise<(Player & { email: string })[]>
+  adminRename(id: string, name: string): Promise<void>
+  /** 刪除角色（一併移出遊戲紀錄與籤池，本人可重新報名） */
+  adminDelete(id: string): Promise<void>
 }
 
 export const ERROR_TEXT: Record<ApiErrorCode, string> = {

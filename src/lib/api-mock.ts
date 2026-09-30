@@ -9,7 +9,7 @@ import { readJson, removeKey, writeJson } from './storage'
 
 const DB_KEY = 'xmas-runner:mock-db'
 const USER_KEY = 'xmas-runner:mock-user'
-type Row = Player & { userId: string }
+type Row = Player & { userId: string; email?: string }
 type MockUser = { id: string; email: string }
 
 const session = () => sessionStorage
@@ -75,7 +75,7 @@ export function createMockApi(): Api {
       const rows = load()
       const n = check(name, avatar, rows)
       if (rows.some((r) => r.userId === user.id)) throw new ApiError('already_registered')
-      save([...rows, { id: crypto.randomUUID(), name: n, avatar, createdAt: new Date().toISOString(), userId: user.id }])
+      save([...rows, { id: crypto.randomUUID(), name: n, avatar, createdAt: new Date().toISOString(), userId: user.id, email: user.email }])
     },
     async getMine() {
       await delay()
@@ -94,6 +94,25 @@ export function createMockApi(): Api {
     async list() {
       await delay()
       return mockPlayers()
+    },
+    async adminPlayers() {
+      await delay()
+      return load().flatMap((r) => {
+        const p = toPlayer(r)
+        return p ? [{ ...p, email: r.email ?? '' }] : []
+      })
+    },
+    async adminRename(id, name) {
+      await delay()
+      const rows = load()
+      const r = rows.find((x) => x.id === id)
+      if (!r) throw new ApiError('not_registered')
+      r.name = check(name, r.avatar, rows, id)
+      save(rows)
+    },
+    async adminDelete(id) {
+      await delay()
+      save(load().filter((r) => r.id !== id))
     },
   }
 }
