@@ -10,7 +10,8 @@
     "typecheck": "vue-tsc -b",
     "build:assets": "tsx scripts/build-assets.ts",
     "verify:assets": "tsx scripts/verify-assets.ts",
-    "test:db": "tsx scripts/test-db.ts"
+    "test:db": "tsx scripts/test-db.ts",
+    "build:favicon": "tsx scripts/build-favicon.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.117.2",
