@@ -9,7 +9,7 @@ import QuizArena from '../components/QuizArena.vue'
 import { useCountdown } from '../composables/useCountdown'
 import { useWakeLock } from '../composables/useWakeLock'
 import { ApiError, ERROR_TEXT } from '../lib/api'
-import { getGameApi, zoneOf, type GameApi, type GamePlayer, type GameState, type LeaderRow } from '../lib/game'
+import { getGameApi, zoneOf, type GameApi, type GamePlayer, type GameState, type LeaderRow, type Pos } from '../lib/game'
 
 const props = defineProps<{ id: string }>()
 
@@ -22,7 +22,7 @@ const err = ref('')
 const game = shallowRef<GameState | null>(null)
 const players = shallowRef<GamePlayer[]>([])
 const board = shallowRef<LeaderRow[]>([])
-const positions = new Map<string, number>()
+const positions = new Map<string, Pos>()
 const offset = ref(0)
 const busy = ref(false)
 const arena = ref<InstanceType<typeof QuizArena>>()
@@ -54,8 +54,8 @@ function onState(g: GameState) {
     if (g.status === 'reveal' && g.choices) {
       const counts = g.choices.map(() => 0)
       for (const p of players.value) {
-        const x = positions.get(p.id)
-        if (x !== undefined) counts[zoneOf(x, g.choices.length)]++
+        const pos = positions.get(p.id)
+        if (pos !== undefined) counts[zoneOf(pos.x, g.choices.length)]++
       }
       zoneCounts.value = counts
     }
@@ -80,8 +80,8 @@ onMounted(async () => {
     offs = [
       gapi.watch(props.id, { state: onState, players: refreshPlayers }),
       gapi.watchMoves(props.id, {
-        move(p, x) {
-          positions.set(p, x)
+        move(p, pos) {
+          positions.set(p, { x: pos.x, y: pos.y ?? positions.get(p)?.y })
           // 還不在清單上的人（剛加入）補抓一次
           if (!players.value.some((pl) => pl.id === p)) refreshPlayers()
         },

@@ -133,8 +133,8 @@ export function createSupabaseGameApi(): GameApi {
       })
       return () => void sb.removeChannel(ch)
     },
-    sendMove(id, playerId, x) {
-      sendOnMoves(id, 'move', { p: playerId, x })
+    sendMove(id, playerId, x, y) {
+      sendOnMoves(id, 'move', { p: playerId, x, y })
     },
     sendAction(id, playerId, a) {
       sendOnMoves(id, 'act', { p: playerId, a })
@@ -143,7 +143,9 @@ export function createSupabaseGameApi(): GameApi {
       const ch = sb
         .channel(`game-moves:${id}`)
         .on('broadcast', { event: 'move' }, ({ payload }) => {
-          if (typeof payload?.p === 'string' && typeof payload?.x === 'number') on.move(payload.p, payload.x)
+          if (typeof payload?.p === 'string' && typeof payload?.x === 'number') {
+            on.move(payload.p, { x: payload.x, y: typeof payload.y === 'number' ? payload.y : undefined })
+          }
         })
         .on('broadcast', { event: 'act' }, ({ payload }) => {
           if (typeof payload?.p === 'string' && isGameAction(payload?.a)) on.action(payload.p, payload.a)

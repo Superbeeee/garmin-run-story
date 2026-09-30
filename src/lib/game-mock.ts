@@ -28,7 +28,7 @@ type Answers = Record<number, { choice: number; at: number }>
 type Msg =
   | { type: 'state'; id: string; v: number }
   | { type: 'players'; id: string; key: string }
-  | { type: 'move'; id: string; p: string; x: number }
+  | { type: 'move'; id: string; p: string; x: number; y: number }
   | { type: 'act'; id: string; p: string; a: GameAction }
 
 const loadGames = () => readJson<{ v: number; list: GameRow[] }>(GAMES) ?? { v: 0, list: [] }
@@ -162,8 +162,8 @@ export function createMockGameApi(): GameApi {
       on.players?.()
       return off
     },
-    sendMove(id, playerId, x) {
-      emit({ type: 'move', id, p: playerId, x })
+    sendMove(id, playerId, x, y) {
+      emit({ type: 'move', id, p: playerId, x, y })
     },
     sendAction(id, playerId, a) {
       emit({ type: 'act', id, p: playerId, a })
@@ -171,7 +171,7 @@ export function createMockGameApi(): GameApi {
     watchMoves(id, on) {
       return listen((m) => {
         if (m.id !== id) return
-        if (m.type === 'move') on.move(m.p, m.x)
+        if (m.type === 'move') on.move(m.p, { x: m.x, y: m.y })
         if (m.type === 'act' && isGameAction(m.a)) on.action(m.p, m.a)
       })
     },

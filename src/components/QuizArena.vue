@@ -1,17 +1,17 @@
 <script setup lang="ts">
 /**
- * 搶答跑位的場地：跑道依選項分成幾個答案區，角色依位置（0～1）左右移動。
+ * 搶答跑位的場地：跑道依選項分成幾個答案區，角色依位置（x 左右、y 前後，0～1）移動。
  * 位置由父層放在 positions（每幀讀取，不需要是 reactive）；公布答案時答對的人跳起來、答錯的人難過。
  */
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { AvatarActor, drawAvatar, preloadAvatar } from '../avatar'
 import { useRafLoop } from '../composables/useRafLoop'
-import { zoneOf, type GameAction, type GamePlayer } from '../lib/game'
+import { defaultLane, zoneOf, type GameAction, type GamePlayer, type Pos } from '../lib/game'
 import { drawCrowdTrack } from '../scene/track'
 
 const props = defineProps<{
   players: GamePlayer[]
-  positions: Map<string, number>
+  positions: Map<string, Pos>
   /** 目前題目的選項；null 表示沒有題目（等待中） */
   choices: string[] | null
   /** 公布後的正確答案 */
@@ -46,13 +46,11 @@ interface Sprite {
   ready: boolean
 }
 
-/** 依 id 決定固定的前後位置，讓角色不會全部疊在同一條線上 */
-function laneY(id: string) {
-  let h = 0
-  for (const c of id) h = (h * 31 + c.charCodeAt(0)) >>> 0
-  return TRACK_TOP + 34 + (h % 1000) / 1000 * (H - BOTTOM_PAD - TRACK_TOP - 34)
-}
+/** 腳底可以站的範圍（跑道內，頭不超過看台） */
+const Y_MIN = TRACK_TOP + 34
+const Y_MAX = H - BOTTOM_PAD
 const toPx = (pos: number) => MARGIN + pos * (W - MARGIN * 2)
+const toPy = (id: string, pos?: Pos) => Y_MIN + (pos?.y ?? defaultLane(id)) * (Y_MAX - Y_MIN)
 
 let sprites: Sprite[] = []
 watch(
@@ -65,7 +63,8 @@ watch(
         prev.player = p
         return prev
       }
-      const s: Sprite = { player: p, actor: new AvatarActor(), x: toPx(props.positions.get(p.id) ?? 0.5), y: laneY(p.id), dir: 1, ready: false }
+      const pos = props.positions.get(p.id)
+      const s: Sprite = { player: p, actor: new AvatarActor(), x: toPx(pos?.x ?? 0.5), y: toPy(p.id, pos), dir: 1, ready: false }
       preloadAvatar(p.avatar).then(() => (s.ready = true), () => {})
       return s
     })
@@ -82,7 +81,7 @@ watch(
     for (const s of sprites) {
       const pos = props.positions.get(s.player.id)
       if (pos === undefined) continue
-      if (zoneOf(pos, props.choices.length) === ans) {
+      if (zoneOf(pos.x, props.choices.length) === ans) {
         s.actor.jump()
         s.actor.emote(HAPPY, now)
       } else {
@@ -146,12 +145,15 @@ useRafLoop((now, dt) => {
 
   for (const s of sprites) {
     const pos = props.positions.get(s.player.id)
-    const target = pos === undefined ? s.x : toPx(pos)
-    const dx = target - s.x
-    const step = Math.sign(dx) * Math.min(Math.abs(dx), MAX_SPEED * dt)
-    s.x += step
-    const moving = Math.abs(dx) > 0.5
-    if (moving) s.dir = Math.sign(dx)
+    const dx = (pos === undefined ? s.x : toPx(pos.x)) - s.x
+    const dy = (pos === undefined ? s.y : toPy(s.player.id, pos)) - s.y
+    // 往目標直線移動，每幀最多 MAX_SPEED * dt
+    const dist = Math.hypot(dx, dy)
+    const k = dist > 0 ? Math.min(1, (MAX_SPEED * dt) / dist) : 0
+    s.x += dx * k
+    s.y += dy * k
+    const moving = dist > 0.5
+    if (Math.abs(dx) > 0.5) s.dir = Math.sign(dx)
     const mode = moving ? 'run' : 'idle'
     if (s.actor.mode !== mode) s.actor.setMode(mode)
     s.actor.update(dt)

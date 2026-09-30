@@ -39,6 +39,19 @@ export interface GamePlayer {
   avatar: AvatarConfig
 }
 
+/** 角色在場地上的位置：x 左右、y 前後（都是 0～1）；還沒收到 y 時用 defaultLane */
+export interface Pos {
+  x: number
+  y?: number
+}
+
+/** 依 id 決定預設的前後位置，讓還沒移動過的角色錯開、不全疊在同一條線上 */
+export function defaultLane(id: string): number {
+  let h = 0
+  for (const c of id) h = (h * 31 + c.charCodeAt(0)) >>> 0
+  return (h % 1000) / 1000
+}
+
 /** 玩家觸發的動作：跳躍，或第幾個表情（對應 EMOTES） */
 export type GameAction = 'jump' | number
 
@@ -66,12 +79,12 @@ export interface GameApi {
   myAnswer(id: string, qIndex: number): Promise<number | null>
   /** 訂閱場次狀態（與新加入的參加者，有給 players 才訂閱）；連上（或重連）時也會各觸發一次。回傳取消訂閱 */
   watch(id: string, on: { state(s: GameState): void; players?(): void }): () => void
-  /** 玩家送出自己的位置（x 為 0～1），呼叫端負責節流 */
-  sendMove(id: string, playerId: string, x: number): void
+  /** 玩家送出自己的位置（x、y 為 0～1），呼叫端負責節流 */
+  sendMove(id: string, playerId: string, x: number, y: number): void
   /** 玩家送出跳躍或表情，呼叫端負責節流 */
   sendAction(id: string, playerId: string, action: GameAction): void
   /** 主持畫面收所有人的位置與動作 */
-  watchMoves(id: string, on: { move(playerId: string, x: number): void; action(playerId: string, a: GameAction): void }): () => void
+  watchMoves(id: string, on: { move(playerId: string, pos: Pos): void; action(playerId: string, a: GameAction): void }): () => void
 
   // 主持人
   listQuestions(): Promise<Question[]>

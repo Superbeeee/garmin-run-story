@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- * 手機遊戲畫面：看題目與倒數，按住左右鍵移動自己的角色，站在哪一區就是答案。
+ * 手機遊戲畫面：看題目與倒數，用十字鍵上下左右移動自己的角色，站在哪一區（左右位置）就是答案。
  * 換區時送出答案（伺服器以截止前最後一次為準）；位置節流後 broadcast 給主持畫面。
  */
 import { computed, onBeforeUnmount, onMounted, ref, shallowRef } from 'vue'
@@ -12,7 +12,7 @@ import { useCountdown } from '../composables/useCountdown'
 import { useRafLoop } from '../composables/useRafLoop'
 import { useWakeLock } from '../composables/useWakeLock'
 import { ApiError, ERROR_TEXT, getApi } from '../lib/api'
-import { getGameApi, zoneOf, type GameAction, type GameApi, type GamePlayer, type GameState, type LeaderRow } from '../lib/game'
+import { defaultLane, getGameApi, zoneOf, type GameAction, type GameApi, type GamePlayer, type GameState, type LeaderRow, type Pos } from '../lib/game'
 import { readJson, writeJson } from '../lib/storage'
 
 const props = defineProps<{ id: string }>()
@@ -20,8 +20,9 @@ const props = defineProps<{ id: string }>()
 // 遊戲中螢幕不要自動休眠
 useWakeLock()
 
-/** 從最左到最右約 2 秒 */
+/** 從最左到最右約 2 秒；前後（場地比較淺）約 1 秒 */
 const SPEED = 0.0005
+const Y_SPEED = 0.001
 /** 20 人同時移動約每秒 50 則，留在免費方案每秒 100 則的上限內；主持畫面會補間，看起來仍然連續 */
 const SEND_MS = 400
 const HEARTBEAT_MS = 5000
@@ -50,12 +51,14 @@ const myRow = computed(() => board.value.find((r) => r.id === me.value?.id) ?? n
 // 位置存在 sessionStorage：重新整理後回到原本的位置，不會換到別的答案區
 const POS_KEY = `xmas-runner:pos:${props.id}`
 const session = () => sessionStorage
-const savedX = readJson<number>(POS_KEY, session)
-let x = typeof savedX === 'number' ? savedX : 0.2 + Math.random() * 0.6
-const positions = new Map<string, number>()
-/** -1 左、0 停、1 右 */
-let held = 0
-let lastSent = -1
+const saved = readJson<Pos>(POS_KEY, session)
+let x = typeof saved?.x === 'number' ? saved.x : 0.2 + Math.random() * 0.6
+/** 前後位置；還沒存過就在載入角色後用 defaultLane */
+let y = typeof saved?.y === 'number' ? saved.y : -1
+const positions = new Map<string, Pos>()
+/** 正在按住的方向（按鈕以 pointerId、鍵盤以按鍵為 key），可以同時按兩個斜著走 */
+const held = new Map<string, [dx: number, dy: number]>()
+let lastSent = { x: -1, y: -1 }
 let lastSentAt = 0
 
 // ---------- 作答 ----------
@@ -107,7 +110,7 @@ function onState(g: GameState) {
       if (c !== null) {
         submitted.value = c
         pendingZone = c
-        if (zoneOf(x, g.choices.length) !== c) setX((c + 0.5) / g.choices.length)
+        if (zoneOf(x, g.choices.length) !== c) setPos((c + 0.5) / g.choices.length, y)
       }
       readyFor = g.qIndex
     }
@@ -129,7 +132,8 @@ onMounted(async () => {
     }
     me.value = { id: mine.id, name: mine.name, avatar: mine.avatar }
     offset.value = off
-    positions.set(mine.id, x)
+    if (y < 0) y = defaultLane(mine.id)
+    positions.set(mine.id, { x, y })
     // 直接開網址（例如重新整理）也確保已加入
     if (g.status !== 'finished') await gapi.join(g.code)
     load.value = 'ready'
@@ -144,22 +148,37 @@ onBeforeUnmount(() => {
   clearTimeout(answerTimer)
 })
 
-function setX(v: number) {
-  x = Math.min(1, Math.max(0, v))
-  if (me.value) positions.set(me.value.id, x)
+const clamp01 = (v: number) => Math.min(1, Math.max(0, v))
+function setPos(nx: number, ny: number) {
+  x = clamp01(nx)
+  y = clamp01(ny)
+  if (me.value) positions.set(me.value.id, { x, y })
 }
 
 useRafLoop((now, dt) => {
   const mine = me.value
   if (!mine || !gapi) return
-  if (held) setX(x + held * SPEED * dt)
+  if (held.size) {
+    let hx = 0
+    let hy = 0
+    for (const [dx, dy] of held.values()) {
+      hx += dx
+      hy += dy
+    }
+    hx = Math.sign(hx)
+    hy = Math.sign(hy)
+    // 斜著走不要比直走快
+    const k = hx && hy ? Math.SQRT1_2 : 1
+    setPos(x + hx * SPEED * dt * k, y + hy * Y_SPEED * dt * k)
+  }
   queueAnswer(now)
   // 移動中節流送出；停著時偶爾送一次，讓後來打開的主持畫面也知道位置
-  const changed = Math.abs(x - lastSent) > 0.001
+  const changed = Math.abs(x - lastSent.x) > 0.001 || Math.abs(y - lastSent.y) > 0.001
   if ((changed && now - lastSentAt > SEND_MS) || now - lastSentAt > HEARTBEAT_MS) {
-    gapi.sendMove(props.id, mine.id, Math.round(x * 1000) / 1000)
-    writeJson(POS_KEY, x, session)
-    lastSent = x
+    const round = (v: number) => Math.round(v * 1000) / 1000
+    gapi.sendMove(props.id, mine.id, round(x), round(y))
+    writeJson(POS_KEY, { x, y }, session)
+    lastSent = { x, y }
     lastSentAt = now
   }
 })
@@ -177,14 +196,30 @@ function act(a: GameAction) {
 }
 
 // ---------- 操作 ----------
-function press(dir: number, e: PointerEvent) {
-  held = dir
-  ;(e.currentTarget as HTMLElement).setPointerCapture?.(e.pointerId)
+type Dir = [dx: number, dy: number]
+const LEFT: Dir = [-1, 0]
+const RIGHT: Dir = [1, 0]
+const UP: Dir = [0, -1]
+const DOWN: Dir = [0, 1]
+function press(dir: Dir, e: PointerEvent) {
+  held.set(`p${e.pointerId}`, dir)
+  try {
+    ;(e.currentTarget as HTMLElement).setPointerCapture?.(e.pointerId)
+  } catch {
+    // 放開時仍會收到 pointerup，沒有 capture 也沒關係
+  }
 }
-function release(dir: number) {
-  if (held === dir) held = 0
+function release(e: PointerEvent) {
+  held.delete(`p${e.pointerId}`)
 }
-const KEYS: Record<string, number> = { ArrowLeft: -1, a: -1, A: -1, ArrowRight: 1, d: 1, D: 1 }
+/** 方向鍵：上下左右排成十字，中間是跳 */
+const PAD = [
+  { area: 'up', dir: UP, text: '▲', label: '往前' },
+  { area: 'left', dir: LEFT, text: '◀', label: '往左' },
+  { area: 'right', dir: RIGHT, text: '▶', label: '往右' },
+  { area: 'down', dir: DOWN, text: '▼', label: '往後' },
+]
+const KEYS: Record<string, Dir> = { arrowleft: LEFT, a: LEFT, arrowright: RIGHT, d: RIGHT, arrowup: UP, w: UP, arrowdown: DOWN, s: DOWN }
 function onKey(e: KeyboardEvent) {
   if (e.type === 'keydown' && !e.repeat) {
     // 空白鍵跳躍、數字鍵 1～8 表情
@@ -195,19 +230,26 @@ function onKey(e: KeyboardEvent) {
     const n = Number(e.key)
     if (n >= 1 && n <= EMOTES.length) return act(n - 1)
   }
-  const dir = KEYS[e.key]
+  const key = e.key.toLowerCase()
+  const dir = KEYS[key]
   if (!dir) return
   e.preventDefault()
-  if (e.type === 'keydown') held = dir
-  else release(dir)
+  if (e.type === 'keydown') held.set(`k${key}`, dir)
+  else held.delete(`k${key}`)
 }
+/** 視窗失去焦點或切到背景時收不到放開的事件，直接全部放開 */
+const releaseAll = () => held.clear()
 onMounted(() => {
   window.addEventListener('keydown', onKey)
   window.addEventListener('keyup', onKey)
+  window.addEventListener('blur', releaseAll)
+  document.addEventListener('visibilitychange', releaseAll)
 })
 onBeforeUnmount(() => {
   window.removeEventListener('keydown', onKey)
   window.removeEventListener('keyup', onKey)
+  window.removeEventListener('blur', releaseAll)
+  document.removeEventListener('visibilitychange', releaseAll)
 })
 
 const result = computed(() => {
@@ -250,7 +292,7 @@ const result = computed(() => {
 
       <template v-else>
         <div class="win prompt" aria-live="polite">
-          <p v-if="game.status === 'waiting'">等待主持人開始<span class="cursor">…</span><br /><small>先練習左右移動吧！</small></p>
+          <p v-if="game.status === 'waiting'">等待主持人開始<span class="cursor">…</span><br /><small>先練習移動吧！</small></p>
           <p v-else>{{ game.prompt }}</p>
         </div>
 
@@ -277,28 +319,19 @@ const result = computed(() => {
 
         <div class="pad" @contextmenu.prevent>
           <button
-            class="btn move"
+            v-for="b in PAD"
+            :key="b.area"
+            :class="['btn', 'move', b.area]"
             type="button"
-            aria-label="往左"
-            @pointerdown="press(-1, $event)"
-            @pointerup="release(-1)"
-            @pointercancel="release(-1)"
-            @lostpointercapture="release(-1)"
+            :aria-label="b.label"
+            @pointerdown="press(b.dir, $event)"
+            @pointerup="release"
+            @pointercancel="release"
+            @lostpointercapture="release"
           >
-            ◀
+            {{ b.text }}
           </button>
           <button class="btn move jump" type="button" @click="act('jump')">跳</button>
-          <button
-            class="btn move"
-            type="button"
-            aria-label="往右"
-            @pointerdown="press(1, $event)"
-            @pointerup="release(1)"
-            @pointercancel="release(1)"
-            @lostpointercapture="release(1)"
-          >
-            ▶
-          </button>
         </div>
         <div class="emotes" aria-label="表情">
           <button v-for="(e, i) in EMOTES" :key="e.face" class="btn ghost emote" type="button" @click="act(i)">{{ e.label }}</button>
@@ -381,17 +414,35 @@ const result = computed(() => {
 }
 .pad {
   display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  gap: 16px;
-  margin-top: 16px;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: repeat(3, 64px);
+  grid-template-areas:
+    '. up .'
+    'left jump right'
+    '. down .';
+  gap: 10px;
+  max-width: 360px;
+  margin: 16px auto 0;
 }
 .move {
-  height: 96px;
-  font-size: 36px;
+  font-size: 28px;
+  padding: 0;
   touch-action: none;
 }
+.up {
+  grid-area: up;
+}
+.left {
+  grid-area: left;
+}
+.right {
+  grid-area: right;
+}
+.down {
+  grid-area: down;
+}
 .jump {
-  width: 88px;
+  grid-area: jump;
   font-size: 22px;
 }
 .emotes {

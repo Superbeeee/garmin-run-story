@@ -33,7 +33,7 @@ async function join() {
     <p class="kicker">★ 活動專區 ★</p>
     <h1 class="title">搶答跑位</h1>
     <div class="win dialog">
-      <p>主持人出題後，按住左右鍵把角色移到你選的答案區，時間到時站在哪一區就是你的答案。答對越多題分數越高！</p>
+      <p>主持人出題後，按住方向鍵把角色移到你選的答案區，時間到時站在哪一區就是你的答案。答對越多題分數越高！</p>
     </div>
     <form class="win panel" novalidate @submit.prevent="join">
       <label for="code">▶ 遊戲代碼</label>
