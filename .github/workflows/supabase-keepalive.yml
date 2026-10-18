@@ -16,9 +16,10 @@ jobs:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
         run: |
+          # 缺設定時要失敗（GitHub 會寄信通知），不能安靜略過，否則專案會在沒人發現時被暫停
           if [ -z "$SUPABASE_URL" ] || [ -z "$SUPABASE_ANON_KEY" ]; then
-            echo "未設定 SUPABASE_URL / SUPABASE_ANON_KEY，略過"
-            exit 0
+            echo "::error::未設定 SUPABASE_URL / SUPABASE_ANON_KEY，保活沒有執行"
+            exit 1
           fi
           curl --fail --silent --show-error --max-time 30 \
             -H "apikey: $SUPABASE_ANON_KEY" \
