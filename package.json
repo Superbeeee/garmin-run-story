@@ -11,7 +11,11 @@
     "build:assets": "tsx scripts/build-assets.ts",
     "verify:assets": "tsx scripts/verify-assets.ts",
     "test:db": "tsx scripts/test-db.ts",
-    "build:favicon": "tsx scripts/build-favicon.ts"
+    "build:favicon": "tsx scripts/build-favicon.ts",
+    "trailer": "vite-node trailer/render.ts",
+    "recap": "vite-node trailer/recap.ts",
+    "recap2": "vite-node trailer/marathon.ts",
+    "logo": "tsx brand/logo.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.117.2",
@@ -20,6 +24,7 @@
   },
   "devDependencies": {
     "@electric-sql/pglite": "^0.5.8",
+    "@napi-rs/canvas": "^1.0.9",
     "@types/node": "^26.6.3",
     "@types/pngjs": "^6.0.5",
     "@vitejs/plugin-vue": "^6.0.9",
@@ -27,6 +32,7 @@
     "tsx": "^4.23.15",
     "typescript": "^5.9.3",
     "vite": "^8.3.1",
+    "vite-node": "^6.0.0",
     "vue-tsc": "^3.3.11"
   },
   "packageManager": "pnpm@9.12.0+sha512.4abf725084d7bcbafbd728bfc7bee61f2f791f977fd87542b3579dcb23504d170d46337945e4c66485cd12d588a0c0e570ed9c477e7ccdd8507cf05f3f92eaca"
