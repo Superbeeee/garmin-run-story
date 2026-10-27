@@ -361,11 +361,14 @@ const result = computed(() => {
   min-height: 44px;
 }
 .code {
-  padding: 2px 10px;
-  background: var(--outline);
+  padding: 3px 12px;
+  background: rgba(20, 27, 38, 0.9);
   color: var(--gold);
+  border: 1px solid var(--gold-border);
+  border-radius: 2px;
   text-shadow: none;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.12em;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 .qno {
   flex: 1;
@@ -396,7 +399,12 @@ const result = computed(() => {
 }
 .arena {
   margin-top: 14px;
-  box-shadow: 0 0 0 4px var(--outline);
+  border-radius: 2px;
+  box-shadow:
+    0 0 0 2px var(--outline),
+    0 0 0 4px var(--gold-border),
+    0 0 0 6px var(--outline),
+    0 12px 28px -6px rgba(10, 16, 26, 0.45);
 }
 .status-line {
   min-height: 1.6em;
@@ -424,8 +432,15 @@ const result = computed(() => {
   max-width: 360px;
   margin: 16px auto 0;
 }
+/* 希卡石板風格方向鍵，中間「跳」維持皇家紅金主鍵 */
+.move:not(.jump) {
+  --btn-bg: linear-gradient(180deg, #243347 0%, #16202e 100%);
+  --btn-border: var(--gold-border);
+  --btn-lo: #0c121b;
+  --btn-ink: var(--gold-hi);
+}
 .move {
-  font-size: 28px;
+  font-size: 26px;
   padding: 0;
   touch-action: none;
 }

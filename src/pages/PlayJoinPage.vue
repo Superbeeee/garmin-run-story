@@ -63,11 +63,17 @@ async function join() {
   padding: 28px 20px 48px;
 }
 .kicker {
-  margin: 0 0 6px;
+  display: inline-block;
+  margin: 0 0 8px;
+  padding: 3px 12px;
   font-size: 14px;
-  letter-spacing: 0.08em;
-  color: var(--gold);
-  text-shadow: var(--text-outline);
+  letter-spacing: 0.12em;
+  color: var(--gold-hi);
+  background: rgba(20, 27, 38, 0.72);
+  border: 1px solid var(--gold-border);
+  border-radius: 2px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 .dialog {
   margin-top: 18px;
@@ -77,7 +83,7 @@ async function join() {
 }
 .panel {
   margin-top: 22px;
-  padding: 16px 18px;
+  padding: 18px 20px;
 }
 label {
   display: block;
@@ -100,17 +106,24 @@ input {
   color: var(--ink);
   background: var(--panel-2);
   border: 0;
-  padding: 9px 12px;
+  border-radius: 2px;
+  padding: 9px 14px;
   box-shadow:
-    -4px 0 0 0 var(--outline),
-    4px 0 0 0 var(--outline),
-    0 -4px 0 0 var(--outline),
-    0 4px 0 0 var(--outline),
-    inset 3px 3px 0 0 var(--panel-lo);
+    0 0 0 2px var(--outline),
+    0 0 0 3.5px var(--gold-border),
+    inset 0 2px 5px rgba(0, 0, 0, 0.18);
+  transition:
+    box-shadow 150ms ease,
+    background-color 150ms ease;
 }
 input:focus {
-  outline: 3px dashed var(--gold);
-  outline-offset: 8px;
+  outline: none;
+  background: var(--panel-solid);
+  box-shadow:
+    0 0 0 2px var(--outline),
+    0 0 0 4px var(--gold),
+    0 0 16px var(--gold-glow),
+    inset 0 2px 4px rgba(0, 0, 0, 0.12);
 }
 input::placeholder {
   letter-spacing: normal;

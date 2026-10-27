@@ -309,19 +309,27 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKey))
   padding: 16px 18px;
 }
 
-/* ---------- 舞台 ---------- */
+/* ---------- 舞台：海拉魯聖殿與希卡神廟祭壇 ---------- */
 .stage {
-  --gold: #ffcd75;
+  --gold: #f0c44d;
   --bulb-speed: 1.2s;
   position: relative;
   overflow: hidden;
-  padding: 18px 24px 22px;
-  background: radial-gradient(ellipse at 50% 30%, #3b1d4a 0%, #1a1c2c 70%);
+  padding: 20px 24px 24px;
+  background:
+    radial-gradient(circle at 50% 28%, rgba(77, 238, 234, 0.14) 0%, transparent 48%),
+    radial-gradient(ellipse at 50% 32%, #1d3347 0%, #0d1520 72%);
   color: var(--snow);
   min-height: min(86vh, 900px);
   display: flex;
   flex-direction: column;
   align-items: center;
+  border-radius: 2px;
+  box-shadow:
+    0 0 0 2px var(--outline),
+    0 0 0 4px var(--gold-border),
+    0 0 0 6px var(--outline),
+    0 18px 44px -6px rgba(8, 12, 20, 0.6);
 }
 .stage.spinning {
   --bulb-speed: 0.25s;
@@ -408,12 +416,15 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKey))
   display: flex;
   align-items: center;
   gap: 26px;
-  background: linear-gradient(#c0374f, #7a1f3a);
+  background: linear-gradient(180deg, #26384d 0%, #162231 100%);
+  border-radius: 3px;
   box-shadow:
-    0 0 0 4px var(--outline),
-    inset 0 6px 0 0 #ef7d57,
-    inset 0 -8px 0 0 #5d275d,
-    0 18px 0 -4px #3d1530;
+    0 0 0 3px var(--outline),
+    0 0 0 6px var(--gold),
+    0 0 0 9px var(--outline),
+    inset 0 4px 0 0 rgba(255, 241, 184, 0.35),
+    inset 0 -8px 0 0 #0e1620,
+    0 18px 36px rgba(0, 0, 0, 0.55);
 }
 .bulbs {
   position: absolute;

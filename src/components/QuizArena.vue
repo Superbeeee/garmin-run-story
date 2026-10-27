@@ -30,7 +30,7 @@ const MARGIN = 14
 const BOTTOM_PAD = 14
 /** 畫面上的移動速度上限（px/ms），比角色跑步快一點，才跟得上手機操作 */
 const MAX_SPEED = 0.2
-const ZONE_COLORS = ['#b13e53', '#3b5dc9', '#38b764', '#ef7d57']
+const ZONE_COLORS = ['#c93b4b', '#2e67b8', '#2f9e5b', '#d97724']
 const HAPPY = 0
 const SAD = 5
 
@@ -132,8 +132,8 @@ function drawZones(ctx: CanvasRenderingContext2D) {
     ctx.fillRect(Math.round(i * zw), TRACK_TOP, Math.ceil(zw), H - TRACK_TOP)
     ctx.globalAlpha = 1
     if (i > 0) {
-      // 區域分隔：白色虛線
-      ctx.fillStyle = '#f4f4f4'
+      // 區域分隔：海拉魯金色虛線
+      ctx.fillStyle = '#f5dc8c'
       for (let y = TRACK_TOP; y < H; y += 6) ctx.fillRect(Math.round(i * zw), y, 1, 3)
     }
   }
@@ -247,12 +247,14 @@ useRafLoop((now, dt) => {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.4em;
-  padding: 0 0.4em;
+  gap: 0.45em;
+  padding: 0 0.45em;
   min-width: 0;
   font-size: clamp(12px, 2.6cqi, 40px);
   color: var(--outline);
-  border-left: 2px dashed rgba(26, 28, 44, 0.3);
+  background: rgba(250, 245, 232, 0.36);
+  border-left: 2px dashed rgba(20, 25, 35, 0.35);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.65);
 }
 .zones li:first-child {
   border-left: 0;
@@ -264,11 +266,16 @@ useRafLoop((now, dt) => {
   flex: none;
   display: inline-grid;
   place-items: center;
-  width: 1.6em;
-  height: 1.6em;
+  width: 1.65em;
+  height: 1.65em;
+  border-radius: 2px;
   color: #fff;
   background: var(--zone);
-  box-shadow: 0 0 0 2px var(--outline);
+  text-shadow: none;
+  box-shadow:
+    0 0 0 1.5px var(--outline),
+    0 0 0 3px var(--gold),
+    0 2px 4px rgba(0, 0, 0, 0.3);
 }
 .text {
   overflow: hidden;
@@ -279,7 +286,9 @@ useRafLoop((now, dt) => {
   overflow-wrap: anywhere;
 }
 .right {
-  background: rgba(56, 183, 100, 0.55);
+  background: rgba(50, 168, 98, 0.62) !important;
+  color: #fff !important;
+  text-shadow: 0 2px 0 var(--outline) !important;
 }
 .right .tag {
   background: var(--green);

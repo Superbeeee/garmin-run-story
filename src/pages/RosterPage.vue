@@ -111,6 +111,12 @@ header p {
   margin-top: 18px;
   padding: 6px;
   background: var(--outline);
+  border-radius: 2px;
+  box-shadow:
+    0 0 0 2px var(--outline),
+    0 0 0 4px var(--gold-border),
+    0 0 0 6px var(--outline),
+    0 14px 32px -6px rgba(10, 16, 26, 0.45);
 }
 .stage:fullscreen {
   display: flex;

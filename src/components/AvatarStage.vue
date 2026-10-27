@@ -182,20 +182,25 @@ useRafLoop((now, dt) => {
   gap: 14px;
   align-items: stretch;
 }
-/* 正面大圖：角色站在一塊小舞台上 */
+/* 正面大圖：角色站在海拉魯神殿石座與三角聖紋舞台上 */
 .portrait {
   display: flex;
   align-items: flex-end;
   justify-content: center;
   padding: 10px 8px 0;
   background:
-    linear-gradient(to top, var(--panel-lo) 0 10px, var(--panel-2) 10px 14px, transparent 14px),
-    var(--panel);
+    linear-gradient(to top, var(--panel-lo) 0 8px, var(--gold-border) 8px 10px, var(--panel-2) 10px 15px, transparent 15px),
+    radial-gradient(circle at 50% 42%, rgba(240, 196, 77, 0.22) 0%, transparent 65%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='46' r='34' fill='none' stroke='%23d4a843' stroke-width='1' stroke-dasharray='3 2' opacity='0.35'/%3E%3Cpolygon points='50,20 35,46 65,46' fill='none' stroke='%23d4a843' stroke-width='1.2' opacity='0.28'/%3E%3Cpolygon points='35,46 20,72 50,72' fill='none' stroke='%23d4a843' stroke-width='1.2' opacity='0.28'/%3E%3Cpolygon points='65,46 50,72 80,72' fill='none' stroke='%23d4a843' stroke-width='1.2' opacity='0.28'/%3E%3C/svg%3E")
+      center 36% / 82% no-repeat,
+    var(--panel-solid);
 }
 .portrait canvas {
   width: 100%;
   max-width: 220px;
   aspect-ratio: 40 / 62;
+  position: relative;
+  z-index: 1;
 }
 .scene-box {
   display: flex;
@@ -203,16 +208,16 @@ useRafLoop((now, dt) => {
   padding: 6px;
   background: var(--outline);
   box-shadow:
-    -4px 0 0 0 var(--outline),
-    4px 0 0 0 var(--outline),
-    0 -4px 0 0 var(--outline),
-    0 4px 0 0 var(--outline);
+    0 0 0 2px var(--outline),
+    0 0 0 4px var(--gold-border),
+    0 0 0 6px var(--outline),
+    0 12px 28px -6px rgba(10, 16, 26, 0.42);
 }
 .scene-box canvas {
   display: block;
   width: 100%;
   aspect-ratio: 16 / 9;
-  background: #cfe2f0;
+  background: #5c9ec8;
 }
 .status {
   font-size: 15px;
@@ -242,10 +247,10 @@ useRafLoop((now, dt) => {
   min-width: 2.6em;
 }
 .bar-label::before {
-  content: '▶ ';
-  color: var(--red);
-  font-size: 10px;
-  vertical-align: 2px;
+  content: '◆ ';
+  color: var(--gold-lo);
+  font-size: 11px;
+  vertical-align: 1px;
 }
 .hint {
   font-size: 13px;

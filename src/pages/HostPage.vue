@@ -440,9 +440,16 @@ async function createGame() {
   font-family: var(--font-text);
   color: var(--ink);
   background: var(--panel-2);
-  border: 2px solid var(--outline);
+  border: 1.5px solid var(--gold-border);
+  border-radius: 2px;
   padding: 6px 10px;
   min-width: 0;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.12);
+}
+.field:focus {
+  outline: none;
+  border-color: var(--gold);
+  box-shadow: 0 0 10px var(--gold-glow);
 }
 .code {
   flex: 1;

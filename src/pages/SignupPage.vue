@@ -236,34 +236,40 @@ header,
   grid-column: 1 / -1;
 }
 .kicker {
-  margin: 0 0 6px;
+  display: inline-block;
+  margin: 0 0 8px;
+  padding: 3px 12px;
   font-size: 14px;
-  letter-spacing: 0.08em;
-  color: var(--gold);
-  text-shadow: var(--text-outline);
+  letter-spacing: 0.12em;
+  color: var(--gold-hi);
+  background: rgba(20, 27, 38, 0.72);
+  border: 1px solid var(--gold-border);
+  border-radius: 2px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
-/* RPG 對話框 */
+/* 薩爾達 NPC 對話框 */
 .dialog {
   margin-top: 18px;
   max-width: 62ch;
-  padding: 12px 34px 12px 16px;
+  padding: 14px 36px 14px 18px;
 }
 .dialog p {
   margin: 0;
 }
 .dialog .next {
   position: absolute;
-  right: 12px;
-  bottom: 8px;
+  right: 14px;
+  bottom: 10px;
   font-size: 12px;
-  color: var(--red);
+  color: var(--gold);
 }
 .stage {
   position: sticky;
   top: 20px;
 }
 .panel {
-  padding: 14px 18px 18px;
+  padding: 18px 20px 20px;
 }
 .loading {
   margin: 8px 0 0;
@@ -271,20 +277,21 @@ header,
 fieldset {
   border: 0;
   margin: 0;
-  padding: 14px 0 14px;
-  border-bottom: 2px dashed var(--panel-lo);
+  padding: 14px 0 15px;
+  border-bottom: 1px solid var(--gold-border);
   min-width: 0;
 }
 legend {
   font-size: 16px;
   padding: 0;
-  margin-bottom: 6px;
+  margin-bottom: 8px;
+  letter-spacing: 0.04em;
 }
 legend::before {
-  content: '▶ ';
-  color: var(--red);
-  font-size: 11px;
-  vertical-align: 2px;
+  content: '◆ ';
+  color: var(--gold-lo);
+  font-size: 12px;
+  vertical-align: 1px;
 }
 fieldset > :not(legend) + :not(legend) {
   margin-top: 10px;
@@ -302,7 +309,7 @@ fieldset > :not(legend) + :not(legend) {
   gap: 12px;
   align-items: center;
 }
-/* 輸入框：內凹的像素框 */
+/* 輸入框：鑲金邊框與內凹石板質感 */
 .row input {
   flex: 1;
   min-width: 0;
@@ -313,24 +320,24 @@ fieldset > :not(legend) + :not(legend) {
   color: var(--ink);
   background: var(--panel-2);
   border: 0;
-  padding: 9px 12px;
+  border-radius: 2px;
+  padding: 10px 14px;
   box-shadow:
-    -4px 0 0 0 var(--outline),
-    4px 0 0 0 var(--outline),
-    0 -4px 0 0 var(--outline),
-    0 4px 0 0 var(--outline),
-    inset 3px 3px 0 0 var(--panel-lo);
+    0 0 0 2px var(--outline),
+    0 0 0 3.5px var(--gold-border),
+    inset 0 2px 5px rgba(0, 0, 0, 0.18);
+  transition:
+    box-shadow 150ms ease,
+    background-color 150ms ease;
 }
 .row input:focus {
   outline: none;
-  background: var(--panel);
+  background: var(--panel-solid);
   box-shadow:
-    -4px 0 0 0 var(--outline),
-    4px 0 0 0 var(--outline),
-    0 -4px 0 0 var(--outline),
-    0 4px 0 0 var(--outline),
-    inset 3px 3px 0 0 var(--panel-lo),
-    0 0 0 8px var(--gold);
+    0 0 0 2px var(--outline),
+    0 0 0 4px var(--gold),
+    0 0 16px var(--gold-glow),
+    inset 0 2px 4px rgba(0, 0, 0, 0.12);
 }
 .row input::placeholder {
   color: var(--muted);
