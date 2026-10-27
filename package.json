@@ -15,7 +15,8 @@
     "trailer": "vite-node trailer/render.ts",
     "recap": "vite-node trailer/recap.ts",
     "recap2": "vite-node trailer/marathon.ts",
-    "logo": "tsx brand/logo.ts"
+    "logo": "tsx brand/logo.ts",
+    "load-test": "tsx scripts/load-test.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.118.0",
