@@ -118,11 +118,11 @@ async function signOut() {
 <template>
   <div class="wrap">
     <header>
-      <p class="kicker">★ 聖誕交換禮物 ★ 跑者報名 ★</p>
-      <h1 class="title">{{ isEdit ? '修改你的跑者' : '捏一個你的跑者' }}</h1>
+      <p class="kicker">▲ 眾神的三角力量 & 四支劍 ▲ 勇者報名 ▲</p>
+      <h1 class="title">{{ isEdit ? '修改你的勇者造型' : '打造你的四支劍勇者' }}</h1>
       <div class="win dialog">
-        <p v-if="isEdit">改好之後按「儲存修改」，活動當天就會用新的造型登場。</p>
-        <p v-else>選好造型、填上名字，按下「完成報名」就報名成功了！活動當天會用這個角色一起玩遊戲，之後用同一個帳號登入就能修改。</p>
+        <p v-if="isEdit">改好戰袍與裝備後按「儲存修改」，活動當天就會以新的勇者姿態登場。</p>
+        <p v-else>選好戰袍配色、尖帽與五官，填上勇者之名並按下「完成報名」！活動當天會用這個角色一起在海拉魯原野闖關，之後用同一個帳號登入就能修改。</p>
         <span class="next cursor" aria-hidden="true">▼</span>
       </div>
     </header>

@@ -1,6 +1,6 @@
 /*
- * 像素 RPG 風格
- * 配色取自 Sweetie 16 調色盤：淺色為白天雪景，深色為聖誕夜空（跟隨系統）。
+ * 《薩爾達傳說：眾神的三角力量 & 四支劍》16-bit 像素 RPG 風格
+ * 淺色為「光明世界・海拉魯翠綠原野與羊皮卷視窗」，深色為「闇之世界・眾神經典深藍金框對話視窗」。
  */
 @font-face {
   font-family: 'Cubic 11';
@@ -9,52 +9,65 @@
 }
 
 :root {
-  /* 固定色 */
-  --outline: #1a1c2c;
-  --red: #b13e53;
-  --red-hi: #ef7d57;
-  --red-lo: #5d275d;
-  --gold: #ffcd75;
-  --gold-lo: #ef7d57;
-  --green: #38b764;
-  --green-lo: #257179;
-  --blue: #3b5dc9;
-  --blue-lo: #29366f;
-  --snow: #f4f4f4;
+  /* 眾神的三角力量 & 四支劍核心色票 */
+  --outline: #141622;
+  --red: #d83848;
+  --red-hi: #ff6870;
+  --red-lo: #881828;
+  --gold: #f8d038;
+  --gold-hi: #fff29c;
+  --gold-lo: #b87c14;
+  --green: #28a848;
+  --green-hi: #68e068;
+  --green-lo: #18682c;
+  --blue: #3878e0;
+  --blue-lo: #1c3c88;
+  --purple: #8848c8;
+  --purple-lo: #4c2080;
+  --snow: #fbf8ee;
+  --frame-gold: #e0a820;
 
-  /* 主題色（淺色：白天雪景） */
-  --bg: #94b0c2;
-  --bg-mid: #a6c0cf;
-  --bg-hi: #b8cfdd;
-  --panel: #f4f4f4;
-  --panel-2: #dfe6ec;
-  --panel-lo: #b3c3d0;
-  --ink: #1a1c2c;
-  --muted: #566c86;
+  /* 淺色模式：光明世界（海拉魯原野翠綠背景 + 古典羊皮卷金框面板） */
+  --bg: #1e6438;
+  --bg-mid: #287c44;
+  --bg-hi: #349450;
+  --panel: #fbf5e2;
+  --panel-2: #efe3c2;
+  --panel-lo: #c9b486;
+  --ink: #181a28;
+  --muted: #5e523e;
   --accent: var(--gold);
-  --accent-ink: #1a1c2c;
-  --track: var(--blue);
-  --danger: #b13e53;
-  --title: #f4f4f4;
+  --accent-ink: #141622;
+  --track: #d8b068;
+  --danger: #c82838;
+  --title: #ffe868;
   color-scheme: light;
 
   --px: 4px;
-  /* 天空背景上的文字用完整描邊，淺色、深色模式都清楚 */
-  --text-outline: 2px 0 0 var(--outline), -2px 0 0 var(--outline), 0 2px 0 var(--outline), 0 -2px 0 var(--outline), 2px 2px 0 var(--outline);
+  /* 原野背景上的文字用完整深色像素描邊 */
+  --text-outline:
+    2px 0 0 var(--outline),
+    -2px 0 0 var(--outline),
+    0 2px 0 var(--outline),
+    0 -2px 0 var(--outline),
+    2px 2px 0 var(--outline);
   --font-pixel: 'Cubic 11', 'PingFang TC', 'Microsoft JhengHei', system-ui, sans-serif;
   --font-text: 'PingFang TC', 'Noto Sans TC', 'Microsoft JhengHei', system-ui, sans-serif;
 }
+
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #1a1c2c;
-    --bg-mid: #222a4d;
-    --bg-hi: #29366f;
-    --panel: #333c57;
-    --panel-2: #29366f;
-    --panel-lo: #1f2540;
-    --ink: #f4f4f4;
-    --muted: #94b0c2;
-    --danger: #ef7d57;
+    /* 深色模式：闇之世界 & 眾神的三角力量經典深藍金邊對話視窗 */
+    --bg: #121024;
+    --bg-mid: #1b1838;
+    --bg-hi: #26204c;
+    --panel: #16203c;
+    --panel-2: #1f2d52;
+    --panel-lo: #0e1528;
+    --frame-gold: #f8d038;
+    --ink: #fbf8ee;
+    --muted: #9eb0d0;
+    --danger: #ff6870;
     color-scheme: dark;
   }
 }
@@ -76,11 +89,19 @@ body {
   line-height: 1.6;
   -webkit-font-smoothing: none;
   padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px);
-  /* 天空漸層：以三段色帶呈現，像素感 */
-  background: linear-gradient(to bottom, var(--bg-hi) 0 72px, var(--bg-mid) 72px 144px, var(--bg) 144px) fixed;
+  /* 16-bit 階層背景 + 微妙像素格紋 */
+  background:
+    repeating-linear-gradient(
+      0deg,
+      rgba(0, 0, 0, 0.04) 0px,
+      rgba(0, 0, 0, 0.04) 2px,
+      transparent 2px,
+      transparent 4px
+    ),
+    linear-gradient(to bottom, var(--bg-hi) 0 84px, var(--bg-mid) 84px 168px, var(--bg) 168px) fixed;
 }
 
-/* 飄雪：兩層可無縫重複的像素雪花圖，以不同速度往下捲動 */
+/* 飄浮的黃金三角神力（Triforce）微光與妖精光點 */
 body::before,
 body::after {
   content: '';
@@ -88,29 +109,29 @@ body::after {
   inset: 0;
   pointer-events: none;
   z-index: 0;
-  opacity: var(--snow-opacity, 0.85);
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240' shape-rendering='crispEdges' fill='%23fff'%3E%3Crect x='20' y='14' width='4' height='4'/%3E%3Crect x='132' y='40' width='4' height='4'/%3E%3Crect x='204' y='96' width='4' height='4'/%3E%3Crect x='64' y='120' width='4' height='4'/%3E%3Crect x='168' y='176' width='4' height='4'/%3E%3Crect x='28' y='204' width='4' height='4'/%3E%3Crect x='104' y='228' width='4' height='4'/%3E%3C/svg%3E");
+  opacity: var(--sparkle-opacity, 0.78);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240' shape-rendering='crispEdges'%3E%3Cg fill='%23f8d038'%3E%3Crect x='24' y='16' width='4' height='4'/%3E%3Crect x='20' y='20' width='4' height='4'/%3E%3Crect x='28' y='20' width='4' height='4'/%3E%3Crect x='140' y='52' width='4' height='4'/%3E%3Crect x='136' y='56' width='4' height='4'/%3E%3Crect x='144' y='56' width='4' height='4'/%3E%3Crect x='76' y='148' width='4' height='4'/%3E%3Crect x='72' y='152' width='4' height='4'/%3E%3Crect x='80' y='152' width='4' height='4'/%3E%3C/g%3E%3Cg fill='%23fff29c'%3E%3Crect x='204' y='96' width='4' height='4'/%3E%3Crect x='168' y='184' width='4' height='4'/%3E%3Crect x='32' y='208' width='4' height='4'/%3E%3C/g%3E%3C/svg%3E");
   background-size: 240px 240px;
-  animation: snow 16s linear infinite;
+  animation: triforce-drift 18s linear infinite;
 }
 body::after {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180' shape-rendering='crispEdges' fill='%23fff'%3E%3Crect x='40' y='20' width='2' height='2'/%3E%3Crect x='150' y='60' width='2' height='2'/%3E%3Crect x='90' y='100' width='2' height='2'/%3E%3Crect x='10' y='130' width='2' height='2'/%3E%3Crect x='120' y='166' width='2' height='2'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180' shape-rendering='crispEdges'%3E%3Cg fill='%2368e068'%3E%3Crect x='40' y='24' width='3' height='3'/%3E%3Crect x='148' y='128' width='3' height='3'/%3E%3C/g%3E%3Cg fill='%23ff6870'%3E%3Crect x='150' y='60' width='3' height='3'/%3E%3C/g%3E%3Cg fill='%2368b8ff'%3E%3Crect x='90' y='100' width='3' height='3'/%3E%3C/g%3E%3Cg fill='%23d088ff'%3E%3Crect x='16' y='136' width='3' height='3'/%3E%3C/g%3E%3C/svg%3E");
   background-size: 180px 180px;
-  animation: snow-small 24s linear infinite;
+  animation: fairy-drift 24s linear infinite;
 }
-@keyframes snow {
+@keyframes triforce-drift {
   to {
-    background-position: 0 240px;
+    background-position: 0 -240px;
   }
 }
-@keyframes snow-small {
+@keyframes fairy-drift {
   to {
-    background-position: 0 180px;
+    background-position: 0 -180px;
   }
 }
 @media (prefers-color-scheme: dark) {
   :root {
-    --snow-opacity: 0.45;
+    --sparkle-opacity: 0.6;
   }
 }
 @media (prefers-reduced-motion: reduce) {
@@ -130,7 +151,7 @@ h3 {
   font-weight: normal;
 }
 
-/* 大標：白字 + 像素描邊 + 紅色落影 */
+/* 大標：《眾神的三角力量 & 四支劍》經典黃金字體 + 黑邊 + 緋紅劍影 */
 .title {
   font-size: 33px;
   line-height: 1.25;
@@ -169,8 +190,8 @@ a:focus-visible {
 }
 
 /*
- * 像素視窗：以四向 box-shadow 畫出缺角外框（經典 RPG 對話框），
- * 內側再加一道亮邊與暗邊做立體感。外框畫在元素外面，所以留 margin。
+ * 眾神的三角力量 16-bit 視窗：
+ * 外層深色像素缺角框 + 內層黃金飾邊框（--frame-gold）+ 角落立體壓邊
  */
 .win {
   position: relative;
@@ -182,27 +203,34 @@ a:focus-visible {
     var(--px) 0 0 0 var(--outline),
     0 calc(var(--px) * -1) 0 0 var(--outline),
     0 var(--px) 0 0 var(--outline),
+    inset 0 0 0 2px var(--frame-gold),
     inset var(--px) var(--px) 0 0 var(--panel-2),
     inset calc(var(--px) * -1) calc(var(--px) * -1) 0 0 var(--panel-lo);
 }
-/* 視窗左上角的標籤 */
+/* 視窗左上角的章節銘牌（四支劍紅底金字） */
 .win-tag {
   position: absolute;
   top: -14px;
   left: 14px;
   background: var(--red);
-  color: var(--snow);
+  color: var(--gold-hi);
   font-size: 14px;
   line-height: 1;
-  padding: 4px 8px 5px;
+  padding: 4px 9px 5px;
   box-shadow:
     -2px 0 0 0 var(--outline),
     2px 0 0 0 var(--outline),
     0 -2px 0 0 var(--outline),
-    0 2px 0 0 var(--outline);
+    0 2px 0 0 var(--outline),
+    inset 0 -2px 0 0 var(--red-lo);
+}
+.win-tag::before {
+  content: '▲ ';
+  color: var(--gold);
+  font-size: 10px;
 }
 
-/* 像素按鈕：按下時下沉 */
+/* 16-bit 勇者按鈕：綠之勇者／紅之勇者立體像素鍵 */
 .btn {
   --btn-bg: var(--red);
   --btn-hi: var(--red-hi);
@@ -247,20 +275,20 @@ a:focus-visible {
 }
 .btn.green {
   --btn-bg: var(--green);
-  --btn-hi: #a7f070;
+  --btn-hi: var(--green-hi);
   --btn-lo: var(--green-lo);
-  --btn-ink: var(--outline);
+  --btn-ink: var(--snow);
 }
 .btn.ghost {
   --btn-bg: var(--panel);
-  --btn-hi: var(--panel);
+  --btn-hi: var(--panel-2);
   --btn-lo: var(--panel-lo);
   --btn-ink: var(--ink);
   font-size: 16px;
   padding: 7px 14px 9px;
 }
 
-/* 分段按鈕列（動作、表情）：一排小像素鍵 */
+/* 分段按鈕列（動作、表情）：眾神道具欄風格小像素鍵 */
 .seg {
   display: inline-flex;
   flex-wrap: wrap;
@@ -315,9 +343,10 @@ a:focus-visible {
   cursor: pointer;
 }
 
-/* 閃爍的游標（▶） */
+/* 閃爍的游標（▶ / ▼） */
 .cursor {
   display: inline-block;
+  color: var(--gold);
   animation: blink 1s steps(2, start) infinite;
 }
 @keyframes blink {

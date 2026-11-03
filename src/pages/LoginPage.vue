@@ -25,12 +25,12 @@ async function signIn() {
 <template>
   <main class="wrap">
     <header>
-      <p class="kicker">★ 聖誕交換禮物 ★ 跑者報名 ★</p>
-      <h1 class="title">聖誕跑者</h1>
+      <p class="kicker">▲ 眾神的三角力量 & 四支劍 ▲ 勇者集結 ▲</p>
+      <h1 class="title">四支劍跑者</h1>
     </header>
     <AvatarStage :config="DEFAULT_CONFIG" />
     <div class="win dialog">
-      <p>捏一個你的像素跑者，活動當天大家一起用角色玩遊戲！先用 Google 登入，一個帳號可以報名一個角色，之後在任何裝置登入都能修改。</p>
+      <p>捏一個你的海拉魯四支劍勇者，活動當天大家一起在原野跑道上競技！先用 Google 登入，一個帳號可以報名一位勇者，之後在任何裝置登入都能隨時換裝。</p>
     </div>
     <div class="actions">
       <button class="btn" type="button" :disabled="busy" @click="signIn">{{ busy ? '前往 Google…' : '▶ 用 Google 登入' }}</button>

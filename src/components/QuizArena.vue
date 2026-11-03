@@ -30,7 +30,8 @@ const MARGIN = 14
 const BOTTOM_PAD = 14
 /** 畫面上的移動速度上限（px/ms），比角色跑步快一點，才跟得上手機操作 */
 const MAX_SPEED = 0.2
-const ZONE_COLORS = ['#b13e53', '#3b5dc9', '#38b764', '#ef7d57']
+/** 四支劍經典四色勇者分區（綠、紅、藍、紫） */
+const ZONE_COLORS = ['#28a848', '#d83848', '#3878e0', '#8848c8']
 const HAPPY = 0
 const SAD = 5
 

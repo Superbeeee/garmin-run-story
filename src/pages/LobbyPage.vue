@@ -67,10 +67,10 @@ async function signOut() {
 <template>
   <main class="wrap">
     <header>
-      <p v-if="joined" class="banner"><span aria-hidden="true">★</span> 報名成功 <span aria-hidden="true">★</span></p>
-      <h1 class="title">跑者大廳</h1>
+      <p v-if="joined" class="banner"><span aria-hidden="true">▲</span> 勇者登錄完成 <span aria-hidden="true">▲</span></p>
+      <h1 class="title">海拉魯勇者大廳</h1>
       <p class="status">
-        <template v-if="state === 'ready'"><span class="count">{{ players.length }}</span> 位跑者已報名</template>
+        <template v-if="state === 'ready'"><span class="count">{{ players.length }}</span> 位勇者已集結</template>
         <template v-else-if="state === 'loading'">讀取中<span class="cursor">…</span></template>
       </p>
       <p v-if="err" class="err" role="alert">{{ err }}</p>
@@ -107,7 +107,7 @@ async function signOut() {
         <RouterLink class="btn" to="/edit">▶ 修改造型</RouterLink>
       </section>
 
-      <h2 class="section-title">全部跑者</h2>
+      <h2 class="section-title">▲ 全部勇者名單</h2>
       <PlayerGrid :players="players" :me-id="me?.id" />
     </template>
 
@@ -205,6 +205,12 @@ header p {
   margin-top: 22px;
   padding: 6px;
   background: var(--outline);
+  box-shadow:
+    -4px 0 0 0 var(--outline),
+    4px 0 0 0 var(--outline),
+    0 -4px 0 0 var(--outline),
+    0 4px 0 0 var(--outline),
+    inset 0 0 0 2px var(--frame-gold);
 }
 .mine {
   margin-top: 28px;

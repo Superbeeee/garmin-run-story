@@ -7,10 +7,9 @@ import credits from '../assets/credits.json'
   <footer class="win credits">
     <h2>素材來源與授權</h2>
     <p>
-      角色素材來自
+      本站《薩爾達傳說：眾神的三角力量 & 四支劍》風格 Q 版二頭身像素角色、海拉魯原野場景與表情頭頂小圖示為 Canvas 點陣自繪；調色盤與基底圖層定義取自
       <a href="https://github.com/LiberatedPixelCup/Universal-LPC-Spritesheet-Character-Generator" target="_blank" rel="noopener">Universal LPC Spritesheet Character Generator</a>
-      與 <a href="https://opengameart.org/" target="_blank" rel="noopener">OpenGameArt</a> 的 Liberated Pixel Cup 系列，本站經過裁切與重新上色，修改後的圖同樣依原授權釋出。
-      各素材依其授權（OGA-BY 3.0、CC-BY-SA 3.0、GPL 3.0 等）使用。表情頭頂的小圖示為本站自繪。
+      與 <a href="https://opengameart.org/" target="_blank" rel="noopener">OpenGameArt</a> 的 Liberated Pixel Cup 系列，依原授權（OGA-BY 3.0、CC-BY-SA 3.0、GPL 3.0 等）釋出。
     </p>
     <!-- 授權要求標示作者，清單不可移除；預設收合以免干擾版面 -->
     <details>

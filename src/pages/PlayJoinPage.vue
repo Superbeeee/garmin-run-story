@@ -30,7 +30,7 @@ async function join() {
 
 <template>
   <main class="wrap">
-    <p class="kicker">★ 活動專區 ★</p>
+    <p class="kicker">▲ 四支劍試煉場 ▲</p>
     <h1 class="title">搶答跑位</h1>
     <div class="win dialog">
       <p>主持人出題後，按住方向鍵把角色移到你選的答案區，時間到時站在哪一區就是你的答案。答對越多題分數越高！</p>

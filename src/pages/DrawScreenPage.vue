@@ -231,7 +231,7 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKey))
         <div class="flash" aria-hidden="true"></div>
 
         <header class="marquee">
-          <span class="star">★</span> 聖誕交換禮物 <span class="star">★</span> 接力抽籤機 <span class="star">★</span>
+          <span class="star">▲</span> 眾神的三角力量 <span class="star">▲</span> 聖域寶箱抽籤機 <span class="star">▲</span>
         </header>
 
         <div class="machine">

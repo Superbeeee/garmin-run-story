@@ -182,14 +182,21 @@ useRafLoop((now, dt) => {
   gap: 14px;
   align-items: stretch;
 }
-/* 正面大圖：角色站在一塊小舞台上 */
+/* 正面大圖：角色站在四支劍聖域石座舞台上 */
 .portrait {
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  padding: 10px 8px 0;
+  padding: 10px 8px 4px;
   background:
-    linear-gradient(to top, var(--panel-lo) 0 10px, var(--panel-2) 10px 14px, transparent 14px),
+    linear-gradient(
+      to top,
+      #788098 0 6px,
+      #b0b8c8 6px 10px,
+      var(--frame-gold) 10px 12px,
+      transparent 12px
+    ),
+    radial-gradient(circle at 50% 38%, rgba(248, 208, 56, 0.22), transparent 70%),
     var(--panel);
 }
 .portrait canvas {
@@ -206,13 +213,14 @@ useRafLoop((now, dt) => {
     -4px 0 0 0 var(--outline),
     4px 0 0 0 var(--outline),
     0 -4px 0 0 var(--outline),
-    0 4px 0 0 var(--outline);
+    0 4px 0 0 var(--outline),
+    inset 0 0 0 2px var(--frame-gold);
 }
 .scene-box canvas {
   display: block;
   width: 100%;
   aspect-ratio: 16 / 9;
-  background: #cfe2f0;
+  background: #4888e0;
 }
 .status {
   font-size: 15px;

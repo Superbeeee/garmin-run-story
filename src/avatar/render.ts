@@ -13,11 +13,11 @@ const FOOT_Y = 62
 /** 正面大圖的畫布尺寸與從 front 圖裁切的範圍 */
 export const PORTRAIT_W = 40
 export const PORTRAIT_H = 62
-// 從格子第 0 列開始裁，高帽子才不會被切掉；原有圖層的位置與原型相同
-const PORTRAIT_SRC = { x: 12, y: 0, w: 40, h: 56 }
-const PORTRAIT_DY = 6
+// 完整裁切 y: 0..62，容納高帽尖端與勇者長靴靴底
+const PORTRAIT_SRC = { x: 12, y: 0, w: 40, h: 62 }
+const PORTRAIT_DY = 0
 /** 正面圖示最高只到這裡，避免戴高帽時超出畫布 */
-const PORTRAIT_ICON_MIN_Y = 11
+const PORTRAIT_ICON_MIN_Y = 9
 
 const HEAD_TOP_SLOTS = new Set(['head', 'hair', 'hat', 'hattrim'])
 
@@ -29,7 +29,7 @@ function headBox(layers: LayerRef[], sheet: SheetName, frame: number) {
   let top = FRAME
   let hairTop = FRAME
   let cx = 32
-  let right = 40
+  let right = 42
   for (const L of layers) {
     if (!HEAD_TOP_SLOTS.has(L.slot)) continue
     const b = frameBox(L.key, sheet, frame)
@@ -79,9 +79,12 @@ export function drawAvatar(ctx: CanvasRenderingContext2D, config: AvatarConfig, 
   ctx.imageSmoothingEnabled = false
 
   if (shadow) {
-    const sw = Math.max(8, 16 + Math.round(pose.lift / 2))
-    ctx.fillStyle = 'rgba(10,20,40,.28)'
-    ctx.fillRect(gx - Math.floor(sw / 2), gy, sw, 2)
+    // 眾神的三角力量 / 四支劍經典橢圓像素腳底陰影
+    const sw = Math.max(10, 18 + Math.round(pose.lift / 2))
+    const sx = gx - Math.floor(sw / 2)
+    ctx.fillStyle = 'rgba(12, 16, 28, 0.36)'
+    ctx.fillRect(sx + 2, gy - 1, sw - 4, 3)
+    ctx.fillRect(sx, gy, sw, 1)
   }
 
   const top = gy - FOOT_Y + pose.lift
