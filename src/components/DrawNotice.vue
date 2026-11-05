@@ -72,12 +72,22 @@ onBeforeUnmount(() => {
   display: grid;
   place-items: center;
   padding: 20px;
-  background: rgba(26, 28, 44, 0.75);
+  background:
+    radial-gradient(circle at 50% 45%, rgba(240, 196, 77, 0.22) 0%, transparent 55%),
+    rgba(12, 18, 28, 0.8);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
 }
 .card {
   width: min(100%, 360px);
-  padding: 20px 20px 22px;
+  padding: 22px 22px 24px;
   text-align: center;
+  box-shadow:
+    0 0 0 2px var(--outline),
+    0 0 0 5px var(--gold),
+    0 0 0 7px var(--outline),
+    0 0 48px var(--gold-glow),
+    0 18px 40px rgba(0, 0, 0, 0.55);
   animation: pop 0.6s cubic-bezier(0.2, 1.6, 0.4, 1) both;
 }
 @keyframes pop {

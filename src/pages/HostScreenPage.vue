@@ -207,9 +207,15 @@ function fullscreen() {
   padding: 16px 18px;
 }
 .screen {
-  padding: 16px 20px 20px;
-  background: var(--outline);
+  padding: 18px 22px 22px;
+  background: linear-gradient(180deg, #131c28 0%, #192638 100%);
   color: var(--snow);
+  border-radius: 2px;
+  box-shadow:
+    0 0 0 2px var(--outline),
+    0 0 0 4px var(--gold-border),
+    0 0 0 6px var(--outline),
+    0 18px 42px -6px rgba(8, 12, 20, 0.55);
 }
 .screen:fullscreen {
   overflow: auto;
@@ -221,6 +227,8 @@ function fullscreen() {
   justify-content: space-between;
   gap: 16px;
   flex-wrap: wrap;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(212, 168, 67, 0.35);
 }
 .join {
   display: flex;
@@ -229,7 +237,7 @@ function fullscreen() {
   flex-wrap: wrap;
 }
 .muted-on-dark {
-  color: #94b0c2;
+  color: #a8becf;
   font-size: 16px;
 }
 .code {
@@ -237,6 +245,7 @@ function fullscreen() {
   font-size: 40px;
   letter-spacing: 0.12em;
   color: var(--gold);
+  text-shadow: 0 0 16px var(--gold-glow);
 }
 .count {
   font-size: 18px;
@@ -254,8 +263,10 @@ function fullscreen() {
 }
 .qno {
   flex: none;
-  padding: 4px 10px;
-  background: var(--red);
+  padding: 4px 12px;
+  background: linear-gradient(180deg, #d84856 0%, #9e2432 100%);
+  border: 1px solid var(--gold);
+  border-radius: 2px;
   font-size: 16px;
 }
 .prompt {
@@ -268,6 +279,7 @@ function fullscreen() {
   flex: none;
   font-size: clamp(36px, 5vw, 72px);
   color: var(--gold);
+  text-shadow: 0 0 18px var(--gold-glow);
 }
 .timer.urgent {
   color: var(--red-hi);
@@ -276,7 +288,11 @@ function fullscreen() {
   /* 依螢幕高度限制寬度，讓題目、場地與主持按鈕同時在畫面內 */
   width: min(100%, calc((100vh - 290px) * 384 / 216));
   margin: 0 auto;
-  box-shadow: 0 0 0 4px #333c57;
+  border-radius: 2px;
+  box-shadow:
+    0 0 0 2px var(--outline),
+    0 0 0 4px var(--gold-border),
+    0 8px 24px rgba(0, 0, 0, 0.45);
 }
 .screen:fullscreen .arena {
   width: min(100%, calc((100vh - 220px) * 384 / 216));

@@ -129,28 +129,31 @@ async function signOut() {
 header p {
   margin: 0;
 }
-/* 金色橫幅，像過關畫面 */
+/* 薩爾達任務完成風格金色橫幅 */
 .banner {
   display: inline-block;
   margin: 4px 4px 14px !important;
-  padding: 6px 18px 8px;
+  padding: 6px 20px 8px;
   font-size: 20px;
-  background: var(--gold);
+  letter-spacing: 0.08em;
+  background: linear-gradient(180deg, var(--gold-hi) 0%, var(--gold) 100%);
   color: var(--outline);
   box-shadow:
-    -4px 0 0 0 var(--outline),
-    4px 0 0 0 var(--outline),
-    0 -4px 0 0 var(--outline),
-    0 4px 0 0 var(--outline),
-    inset 0 -4px 0 0 var(--gold-lo);
-  animation: pop 0.5s steps(4) both;
+    0 0 0 2px var(--outline),
+    0 0 0 4px var(--gold),
+    0 0 0 6px var(--outline),
+    inset 0 -3px 0 0 var(--gold-lo),
+    0 0 20px var(--gold-glow);
+  animation: pop 0.45s cubic-bezier(0.2, 1.4, 0.4, 1) both;
 }
 @keyframes pop {
   from {
-    transform: scale(0.4);
+    transform: scale(0.5);
+    opacity: 0;
   }
   to {
     transform: scale(1);
+    opacity: 1;
   }
 }
 @media (prefers-reduced-motion: reduce) {
@@ -181,37 +184,61 @@ header p {
 .event {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  margin-top: 22px;
-  padding: 20px 18px 16px;
+  gap: 5px;
+  margin-top: 24px;
+  padding: 20px 20px 16px;
   text-decoration: none;
   color: var(--ink);
+  transition:
+    transform 150ms ease,
+    box-shadow 150ms ease;
 }
 .event.active {
-  outline: 4px solid var(--gold);
-  outline-offset: 4px;
+  box-shadow:
+    0 0 0 2px var(--outline),
+    0 0 0 5px var(--gold),
+    0 0 0 7px var(--outline),
+    0 0 24px var(--gold-glow),
+    0 12px 28px -6px rgba(10, 16, 26, 0.42);
+}
+.event:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 0 0 2px var(--outline),
+    0 0 0 4px var(--gold-hi),
+    0 0 0 6px var(--outline),
+    0 0 20px var(--gold-glow),
+    0 14px 30px -6px rgba(10, 16, 26, 0.45);
 }
 .event:hover .event-title {
   color: var(--red);
 }
 .event-title {
   font-size: 22px;
+  letter-spacing: 0.04em;
+  transition: color 120ms ease;
 }
 .event-desc {
   font-size: 14px;
   color: var(--muted);
 }
 .stage {
-  margin-top: 22px;
+  margin-top: 24px;
   padding: 6px;
   background: var(--outline);
+  border-radius: 2px;
+  box-shadow:
+    0 0 0 2px var(--outline),
+    0 0 0 4px var(--gold-border),
+    0 0 0 6px var(--outline),
+    0 14px 32px -6px rgba(10, 16, 26, 0.45);
 }
 .mine {
   margin-top: 28px;
   display: flex;
   align-items: center;
-  gap: 14px;
-  padding: 18px 16px 14px;
+  gap: 16px;
+  padding: 20px 18px 16px;
 }
 .mine canvas {
   width: 48px;
@@ -233,10 +260,21 @@ header p {
   font-size: 13px;
 }
 .section-title {
-  margin: 32px 0 12px;
-  font-size: 20px;
+  margin: 34px 0 14px;
+  font-size: 21px;
+  letter-spacing: 0.06em;
   color: var(--title);
   text-shadow: var(--text-outline);
+}
+.section-title::before {
+  content: '◆ ';
+  color: var(--gold);
+  font-size: 15px;
+}
+.section-title::after {
+  content: ' ◆';
+  color: var(--gold);
+  font-size: 15px;
 }
 .account {
   margin: 28px 0 0;

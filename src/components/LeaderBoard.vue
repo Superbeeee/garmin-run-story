@@ -29,32 +29,39 @@ defineProps<{ rows: LeaderRow[]; meId?: string; total?: number }>()
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 6px 14px;
+  padding: 8px 16px;
   min-width: 0;
 }
 .board li.me {
-  outline: 4px solid var(--gold);
-  outline-offset: 4px;
+  box-shadow:
+    0 0 0 2px var(--outline),
+    0 0 0 4.5px var(--gold),
+    0 0 0 6.5px var(--outline),
+    0 0 18px var(--gold-glow),
+    0 10px 24px -6px rgba(10, 16, 26, 0.4);
 }
 .rank {
   flex: none;
-  width: 1.8em;
+  width: 1.9em;
   font-size: 22px;
   text-align: center;
+  text-shadow: 0 2px 0 rgba(0, 0, 0, 0.18);
 }
 .r1 .rank {
-  color: #d9a400;
+  color: #e6a800;
+  text-shadow: 0 0 10px rgba(240, 196, 77, 0.55);
 }
 .r2 .rank {
-  color: #8a9bb0;
+  color: #7c95ad;
 }
 .r3 .rank {
-  color: var(--gold-lo);
+  color: #c27229;
 }
 .board canvas {
   width: 32px;
   height: 50px;
   flex: none;
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.22));
 }
 .name {
   flex: 1;
@@ -69,6 +76,13 @@ defineProps<{ rows: LeaderRow[]; meId?: string; total?: number }>()
 .score {
   flex: none;
   font-size: 22px;
+  color: var(--gold-lo);
+}
+@media (prefers-color-scheme: dark) {
+  .r1 .rank,
+  .score {
+    color: var(--gold);
+  }
 }
 .score small {
   font-size: 13px;

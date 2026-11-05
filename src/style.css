@@ -1,6 +1,7 @@
 /*
- * 像素 RPG 風格
- * 配色取自 Sweetie 16 調色盤：淺色為白天雪景，深色為聖誕夜空（跟隨系統）。
+ * 薩爾達傳說（The Legend of Zelda）海拉魯奇幻冒險風格
+ * 結合《曠野之息 / 王國之淚》的希卡石板（Sheikah Slate）、皇室金紋（Hylian Gold）
+ * 與溫潤羊皮紙卷軸質感，同時保留角色像素精靈的復古魅力。
  */
 @font-face {
   font-family: 'Cubic 11';
@@ -9,52 +10,82 @@
 }
 
 :root {
-  /* 固定色 */
-  --outline: #1a1c2c;
-  --red: #b13e53;
-  --red-hi: #ef7d57;
-  --red-lo: #5d275d;
-  --gold: #ffcd75;
-  --gold-lo: #ef7d57;
-  --green: #38b764;
-  --green-lo: #257179;
-  --blue: #3b5dc9;
-  --blue-lo: #29366f;
-  --snow: #f4f4f4;
+  /* 薩爾達核心色票 */
+  --outline: #141923;
+  --gold: #f0c44d;
+  --gold-hi: #fff1b8;
+  --gold-lo: #b07d1e;
+  --gold-border: rgba(212, 168, 67, 0.72);
+  --gold-glow: rgba(240, 196, 77, 0.42);
+  --sheikah: #4deeea;
+  --sheikah-lo: #1b8a99;
+  --sheikah-glow: rgba(77, 238, 234, 0.35);
 
-  /* 主題色（淺色：白天雪景） */
-  --bg: #94b0c2;
-  --bg-mid: #a6c0cf;
-  --bg-hi: #b8cfdd;
-  --panel: #f4f4f4;
-  --panel-2: #dfe6ec;
-  --panel-lo: #b3c3d0;
-  --ink: #1a1c2c;
-  --muted: #566c86;
+  --red: #c93b4b;
+  --red-hi: #e86870;
+  --red-lo: #731d28;
+  --green: #32a862;
+  --green-lo: #1b633c;
+  --blue: #2e67b8;
+  --blue-lo: #1b386b;
+  --snow: #fbf8ef;
+
+  /* 淺色模式：海拉魯晴空與遠山 + 古代羊皮紙卷軸面板 */
+  --bg: #a3cbb8;
+  --bg-mid: #5d9ec4;
+  --bg-hi: #2f6ca0;
+  --bg-horizon: #dce5c6;
+  --panel: rgba(248, 243, 228, 0.94);
+  --panel-solid: #f8f3e4;
+  --panel-2: #ebe1c5;
+  --panel-lo: #c9ba91;
+  --ink: #1e242b;
+  --muted: #5c635a;
   --accent: var(--gold);
-  --accent-ink: #1a1c2c;
-  --track: var(--blue);
-  --danger: #b13e53;
-  --title: #f4f4f4;
+  --accent-ink: #181c24;
+  --track: #3b4b59;
+  --danger: #bf303c;
+  --title: #fff9e6;
+  --dialog-bg: rgba(20, 27, 38, 0.92);
+  --dialog-ink: #f7f1df;
   color-scheme: light;
 
   --px: 4px;
-  /* 天空背景上的文字用完整描邊，淺色、深色模式都清楚 */
-  --text-outline: 2px 0 0 var(--outline), -2px 0 0 var(--outline), 0 2px 0 var(--outline), 0 -2px 0 var(--outline), 2px 2px 0 var(--outline);
+  --text-outline:
+    0 2px 0 var(--outline),
+    2px 0 0 var(--outline),
+    -2px 0 0 var(--outline),
+    0 -2px 0 var(--outline),
+    2px 2px 0 var(--outline),
+    -2px -2px 0 var(--outline),
+    2px -2px 0 var(--outline),
+    -2px 2px 0 var(--outline),
+    0 4px 10px rgba(12, 18, 28, 0.45);
   --font-pixel: 'Cubic 11', 'PingFang TC', 'Microsoft JhengHei', system-ui, sans-serif;
   --font-text: 'PingFang TC', 'Noto Sans TC', 'Microsoft JhengHei', system-ui, sans-serif;
+
+  /* 四角海拉魯金紋裝飾 SVG */
+  --corner-tl: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Cpath fill='%23d4a843' d='M0 0h12v2H2v10H0V0zm4 4h6v1.5H5.5V10H4V4zm3 3h2v2H7V7z'/%3E%3C/svg%3E");
+  --corner-tr: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Cpath fill='%23d4a843' d='M4 0h12v12h-2V2H4V0zm2 4h6v6h-1.5V5.5H6V4zm1 3h2v2H7V7z'/%3E%3C/svg%3E");
+  --corner-bl: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Cpath fill='%23d4a843' d='M0 4h2v10h10v2H0V4zm4 2h1.5v4.5H10V12H4V6zm3 1h2v2H7V7z'/%3E%3C/svg%3E");
+  --corner-br: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Cpath fill='%23d4a843' d='M14 4h2v12H4v-2h10V4zm-3.5 2H12v6H6v-1.5h4.5V6zM7 7h2v2H7V7z'/%3E%3C/svg%3E");
 }
+
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #1a1c2c;
-    --bg-mid: #222a4d;
-    --bg-hi: #29366f;
-    --panel: #333c57;
-    --panel-2: #29366f;
-    --panel-lo: #1f2540;
-    --ink: #f4f4f4;
-    --muted: #94b0c2;
-    --danger: #ef7d57;
+    /* 深色模式：希卡石板（Sheikah Slate）與星夜海拉魯 */
+    --bg: #162a36;
+    --bg-mid: #10202e;
+    --bg-hi: #09111b;
+    --bg-horizon: #1f3d44;
+    --panel: rgba(19, 27, 38, 0.92);
+    --panel-solid: #151e2b;
+    --panel-2: #1d293a;
+    --panel-lo: #0e151f;
+    --ink: #f4efe1;
+    --muted: #98aebc;
+    --danger: #ff7a7a;
+    --gold-border: rgba(229, 184, 75, 0.65);
     color-scheme: dark;
   }
 }
@@ -64,23 +95,36 @@
 *::after {
   box-sizing: border-box;
 }
+
 html {
   -webkit-text-size-adjust: 100%;
+  accent-color: var(--gold);
+  scrollbar-color: var(--gold-lo) rgba(20, 25, 35, 0.25);
 }
+
+::selection {
+  background: var(--gold);
+  color: var(--outline);
+}
+
 body {
   margin: 0;
   min-height: 100vh;
   color: var(--ink);
   font-family: var(--font-pixel);
   font-size: 16px;
-  line-height: 1.6;
-  -webkit-font-smoothing: none;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
   padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px);
-  /* 天空漸層：以三段色帶呈現，像素感 */
-  background: linear-gradient(to bottom, var(--bg-hi) 0 72px, var(--bg-mid) 72px 144px, var(--bg) 144px) fixed;
+  /* 海拉魯天空與晨霧漸層 + 遠方雙子山與城堡剪影 */
+  background:
+    radial-gradient(ellipse 90% 45% at 50% 0%, rgba(255, 244, 196, 0.22) 0%, transparent 70%),
+    linear-gradient(180deg, var(--bg-hi) 0%, var(--bg-mid) 44%, var(--bg) 78%, var(--bg-horizon) 100%) fixed;
 }
 
-/* 飄雪：兩層可無縫重複的像素雪花圖，以不同速度往下捲動 */
+/*
+ * 漂浮的黃金靈光微粒與靜謐公主光點（取代單調方塊雪花，營造曠野奇幻氛圍）
+ */
 body::before,
 body::after {
   content: '';
@@ -88,37 +132,58 @@ body::after {
   inset: 0;
   pointer-events: none;
   z-index: 0;
-  opacity: var(--snow-opacity, 0.85);
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240' shape-rendering='crispEdges' fill='%23fff'%3E%3Crect x='20' y='14' width='4' height='4'/%3E%3Crect x='132' y='40' width='4' height='4'/%3E%3Crect x='204' y='96' width='4' height='4'/%3E%3Crect x='64' y='120' width='4' height='4'/%3E%3Crect x='168' y='176' width='4' height='4'/%3E%3Crect x='28' y='204' width='4' height='4'/%3E%3Crect x='104' y='228' width='4' height='4'/%3E%3C/svg%3E");
-  background-size: 240px 240px;
-  animation: snow 16s linear infinite;
+  opacity: var(--mote-opacity, 0.85);
 }
+
+body::before {
+  /* 黃金三角之力微光與精靈光點 */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260' viewBox='0 0 260 260'%3E%3Cg fill='%23ffe885' opacity='0.85'%3E%3Cpolygon points='28,16 31,20 28,24 25,20'/%3E%3Cpolygon points='142,44 146,50 142,56 138,50'/%3E%3Cpolygon points='216,102 219,106 216,110 213,106'/%3E%3Cpolygon points='72,134 76,140 72,146 68,140'/%3E%3Cpolygon points='184,188 187,192 184,196 181,192'/%3E%3Cpolygon points='36,218 40,224 36,230 32,224'/%3E%3Cpolygon points='118,238 121,242 118,246 115,242'/%3E%3C/g%3E%3Cg fill='%2385f7ff' opacity='0.75'%3E%3Ccircle cx='88' cy='32' r='2'/%3E%3Ccircle cx='232' cy='58' r='1.8'/%3E%3Ccircle cx='18' cy='112' r='1.8'/%3E%3Ccircle cx='158' cy='148' r='2.2'/%3E%3Ccircle cx='226' cy='224' r='2'/%3E%3C/g%3E%3C/svg%3E");
+  background-size: 260px 260px;
+  animation: spirit-drift 20s linear infinite;
+}
+
 body::after {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180' shape-rendering='crispEdges' fill='%23fff'%3E%3Crect x='40' y='20' width='2' height='2'/%3E%3Crect x='150' y='60' width='2' height='2'/%3E%3Crect x='90' y='100' width='2' height='2'/%3E%3Crect x='10' y='130' width='2' height='2'/%3E%3Crect x='120' y='166' width='2' height='2'/%3E%3C/svg%3E");
-  background-size: 180px 180px;
-  animation: snow-small 24s linear infinite;
+  /* 遠方海拉魯山脈剪影與細微星塵 */
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 180' preserveAspectRatio='none'%3E%3Cpath fill='rgba(20,32,44,0.16)' d='M0,180 L0,128 L90,98 L165,122 L280,54 L305,112 L330,48 L430,118 L540,92 L650,126 L735,78 L750,52 L762,32 L774,52 L790,78 L880,120 L1010,68 L1140,115 L1270,82 L1370,112 L1440,96 L1440,180 Z'/%3E%3Cpath fill='rgba(16,26,36,0.22)' d='M0,180 L0,148 L140,126 L260,146 L420,114 L580,144 L760,118 L920,145 L1100,116 L1260,142 L1440,124 L1440,180 Z'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200' viewBox='0 0 200 200'%3E%3Cg fill='%23ffffff' opacity='0.65'%3E%3Ccircle cx='44' cy='24' r='1.5'/%3E%3Ccircle cx='156' cy='66' r='1.2'/%3E%3Ccircle cx='96' cy='108' r='1.5'/%3E%3Ccircle cx='16' cy='140' r='1.2'/%3E%3Ccircle cx='132' cy='176' r='1.5'/%3E%3C/g%3E%3C/svg%3E");
+  background-size: 100% 180px, 200px 200px;
+  background-position: bottom center, 0 0;
+  background-repeat: no-repeat, repeat;
+  animation: spirit-drift-slow 32s linear infinite;
 }
-@keyframes snow {
+
+@keyframes spirit-drift {
+  from {
+    background-position: 0 0;
+  }
   to {
-    background-position: 0 240px;
+    background-position: 60px 260px;
   }
 }
-@keyframes snow-small {
+
+@keyframes spirit-drift-slow {
+  from {
+    background-position: bottom center, 0 0;
+  }
   to {
-    background-position: 0 180px;
+    background-position: bottom center, -40px 200px;
   }
 }
+
 @media (prefers-color-scheme: dark) {
   :root {
-    --snow-opacity: 0.45;
+    --mote-opacity: 0.72;
   }
 }
+
 @media (prefers-reduced-motion: reduce) {
   body::before,
   body::after {
     animation: none;
   }
 }
+
 #app {
   position: relative;
   z-index: 1;
@@ -130,176 +195,249 @@ h3 {
   font-weight: normal;
 }
 
-/* 大標：白字 + 像素描邊 + 紅色落影 */
+/*
+ * 薩爾達傳說章節大標題：皇室燦金漸層字體 + 深曜石立體描邊 + 金色光暈
+ */
 .title {
-  font-size: 33px;
+  font-size: 35px;
   line-height: 1.25;
   margin: 0;
   color: var(--title);
-  letter-spacing: 0.04em;
+  letter-spacing: 0.06em;
   text-shadow:
+    0 2px 0 var(--outline),
     2px 0 0 var(--outline),
     -2px 0 0 var(--outline),
-    0 2px 0 var(--outline),
     0 -2px 0 var(--outline),
     2px 2px 0 var(--outline),
     -2px -2px 0 var(--outline),
     2px -2px 0 var(--outline),
     -2px 2px 0 var(--outline),
-    5px 5px 0 var(--red);
+    0 4px 0 #7a5310,
+    0 6px 18px rgba(0, 0, 0, 0.48);
 }
 
 canvas.pixel {
   image-rendering: pixelated;
   image-rendering: crisp-edges;
 }
+
 button {
   font: inherit;
   color: inherit;
 }
+
 a {
   color: inherit;
 }
+
 button:focus-visible,
 input:focus-visible,
 summary:focus-visible,
 a:focus-visible {
-  outline: 3px dashed var(--gold);
+  outline: 2px solid var(--sheikah);
   outline-offset: 4px;
+  box-shadow: 0 0 12px var(--sheikah-glow);
 }
 
 /*
- * 像素視窗：以四向 box-shadow 畫出缺角外框（經典 RPG 對話框），
- * 內側再加一道亮邊與暗邊做立體感。外框畫在元素外面，所以留 margin。
+ * 薩爾達風格視窗（.win）：
+ * 外層深曜石邊框 + 內層皇室金線（gold filigree）+ 四角海拉魯紋章圖騰 + 微毛玻璃立體陰影
  */
 .win {
   position: relative;
-  background: var(--panel);
+  background-color: var(--panel);
+  background-image: var(--corner-tl), var(--corner-tr), var(--corner-bl), var(--corner-br);
+  background-repeat: no-repeat;
+  background-position:
+    top 4px left 4px,
+    top 4px right 4px,
+    bottom 4px left 4px,
+    bottom 4px right 4px;
+  background-size: 14px 14px;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   margin: var(--px);
-  padding: 14px 16px;
+  padding: 16px 18px;
+  border-radius: 2px;
   box-shadow:
-    calc(var(--px) * -1) 0 0 0 var(--outline),
-    var(--px) 0 0 0 var(--outline),
-    0 calc(var(--px) * -1) 0 0 var(--outline),
-    0 var(--px) 0 0 var(--outline),
-    inset var(--px) var(--px) 0 0 var(--panel-2),
-    inset calc(var(--px) * -1) calc(var(--px) * -1) 0 0 var(--panel-lo);
-}
-/* 視窗左上角的標籤 */
-.win-tag {
-  position: absolute;
-  top: -14px;
-  left: 14px;
-  background: var(--red);
-  color: var(--snow);
-  font-size: 14px;
-  line-height: 1;
-  padding: 4px 8px 5px;
-  box-shadow:
-    -2px 0 0 0 var(--outline),
-    2px 0 0 0 var(--outline),
-    0 -2px 0 0 var(--outline),
-    0 2px 0 0 var(--outline);
+    0 0 0 2px var(--outline),
+    0 0 0 4px var(--gold-border),
+    0 0 0 6px var(--outline),
+    inset 0 0 0 1px rgba(255, 245, 210, 0.35),
+    0 12px 28px -6px rgba(10, 16, 26, 0.38);
 }
 
-/* 像素按鈕：按下時下沉 */
+/* 經典薩爾達 NPC 對話框（深色曜石半透明底 + 金色雙線邊框） */
+.win.dialog {
+  background-color: var(--dialog-bg);
+  color: var(--dialog-ink);
+  box-shadow:
+    0 0 0 2px var(--outline),
+    0 0 0 4px var(--gold),
+    0 0 0 6px var(--outline),
+    inset 0 0 24px rgba(240, 196, 77, 0.08),
+    0 14px 32px -6px rgba(8, 12, 20, 0.55);
+}
+
+/* 視窗左上角的海拉魯銘牌標籤 */
+.win-tag {
+  position: absolute;
+  top: -15px;
+  left: 16px;
+  background: linear-gradient(180deg, #243044 0%, #151c28 100%);
+  color: var(--gold-hi);
+  font-size: 13px;
+  line-height: 1;
+  letter-spacing: 0.08em;
+  padding: 5px 11px 6px;
+  border-radius: 2px;
+  box-shadow:
+    0 0 0 2px var(--outline),
+    0 0 0 3.5px var(--gold),
+    0 4px 10px rgba(0, 0, 0, 0.35);
+}
+.win-tag::before {
+  content: '◆ ';
+  color: var(--gold);
+  font-size: 10px;
+}
+.win-tag::after {
+  content: ' ◆';
+  color: var(--gold);
+  font-size: 10px;
+}
+
+/*
+ * 薩爾達風格按鈕：
+ * 皇室金邊鑲嵌 + 寶石漸層光澤 + 懸停時煥發希卡/黃金靈光
+ */
 .btn {
-  --btn-bg: var(--red);
-  --btn-hi: var(--red-hi);
-  --btn-lo: var(--red-lo);
+  --btn-bg: linear-gradient(180deg, #d84856 0%, #a82836 100%);
+  --btn-border: var(--gold);
+  --btn-lo: #63141d;
   --btn-ink: var(--snow);
   display: inline-block;
   position: relative;
   border: 0;
+  border-radius: 2px;
   margin: var(--px);
-  padding: 10px 18px 12px;
+  padding: 10px 20px 12px;
   font-size: 18px;
   line-height: 1.2;
+  letter-spacing: 0.04em;
   color: var(--btn-ink);
   background: var(--btn-bg);
   text-decoration: none;
   cursor: pointer;
   box-shadow:
-    calc(var(--px) * -1) 0 0 0 var(--outline),
-    var(--px) 0 0 0 var(--outline),
-    0 calc(var(--px) * -1) 0 0 var(--outline),
-    0 var(--px) 0 0 var(--outline),
-    inset 0 calc(var(--px) * -1) 0 0 var(--btn-lo),
-    inset var(--px) var(--px) 0 0 var(--btn-hi);
-  transition: transform 60ms steps(1);
+    0 0 0 2px var(--outline),
+    0 0 0 4px var(--btn-border),
+    0 0 0 5px var(--outline),
+    inset 0 2px 0 0 rgba(255, 255, 255, 0.28),
+    inset 0 -3px 0 0 var(--btn-lo),
+    0 6px 14px rgba(12, 18, 28, 0.35);
+  transition:
+    transform 120ms ease,
+    filter 120ms ease,
+    box-shadow 150ms ease;
 }
-.btn:hover {
+
+.btn:hover:not(:disabled) {
   filter: brightness(1.08);
+  box-shadow:
+    0 0 0 2px var(--outline),
+    0 0 0 4px var(--gold-hi),
+    0 0 0 5px var(--outline),
+    inset 0 2px 0 0 rgba(255, 255, 255, 0.38),
+    inset 0 -3px 0 0 var(--btn-lo),
+    0 0 18px var(--gold-glow),
+    0 6px 16px rgba(12, 18, 28, 0.4);
 }
+
 .btn:active:not(:disabled) {
   transform: translateY(2px);
   box-shadow:
-    calc(var(--px) * -1) 0 0 0 var(--outline),
-    var(--px) 0 0 0 var(--outline),
-    0 calc(var(--px) * -1) 0 0 var(--outline),
-    0 var(--px) 0 0 var(--outline),
-    inset 0 2px 0 0 var(--btn-lo);
+    0 0 0 2px var(--outline),
+    0 0 0 4px var(--btn-border),
+    0 0 0 5px var(--outline),
+    inset 0 2px 0 0 var(--btn-lo),
+    0 2px 6px rgba(12, 18, 28, 0.3);
 }
+
 .btn:disabled {
-  filter: grayscale(0.7);
-  opacity: 0.7;
+  filter: grayscale(0.75);
+  opacity: 0.65;
   cursor: default;
 }
+
 .btn.green {
-  --btn-bg: var(--green);
-  --btn-hi: #a7f070;
-  --btn-lo: var(--green-lo);
-  --btn-ink: var(--outline);
+  --btn-bg: linear-gradient(180deg, #42b871 0%, #24824a 100%);
+  --btn-border: var(--gold);
+  --btn-lo: #144d2b;
+  --btn-ink: #ffffff;
 }
+
 .btn.ghost {
-  --btn-bg: var(--panel);
-  --btn-hi: var(--panel);
+  --btn-bg: linear-gradient(180deg, var(--panel-solid) 0%, var(--panel-2) 100%);
+  --btn-border: var(--panel-lo);
   --btn-lo: var(--panel-lo);
   --btn-ink: var(--ink);
   font-size: 16px;
-  padding: 7px 14px 9px;
+  padding: 7px 15px 9px;
+}
+.btn.ghost:hover:not(:disabled) {
+  --btn-border: var(--gold);
 }
 
-/* 分段按鈕列（動作、表情）：一排小像素鍵 */
+/* 分段按鈕列（動作、表情）：薩爾達道具欄風格小鍵 */
 .seg {
   display: inline-flex;
   flex-wrap: wrap;
   gap: 6px 8px;
   padding: 2px;
 }
+
 .seg button {
   border: 0;
+  border-radius: 2px;
   margin: 2px;
-  padding: 5px 11px 7px;
+  padding: 5px 12px 7px;
   font-size: 15px;
   line-height: 1.2;
-  background: var(--panel);
+  background: var(--panel-2);
   color: var(--ink);
   cursor: pointer;
   box-shadow:
-    -2px 0 0 0 var(--outline),
-    2px 0 0 0 var(--outline),
-    0 -2px 0 0 var(--outline),
-    0 2px 0 0 var(--outline),
+    0 0 0 2px var(--outline),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.25),
+    inset 0 -3px 0 0 var(--panel-lo);
+  transition:
+    background-color 120ms ease,
+    box-shadow 120ms ease,
+    transform 80ms ease;
+}
+
+.seg button:hover {
+  background: var(--panel-solid);
+  box-shadow:
+    0 0 0 2px var(--gold),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.35),
     inset 0 -3px 0 0 var(--panel-lo);
 }
+
 .seg button:active {
   transform: translateY(2px);
-  box-shadow:
-    -2px 0 0 0 var(--outline),
-    2px 0 0 0 var(--outline),
-    0 -2px 0 0 var(--outline),
-    0 2px 0 0 var(--outline);
 }
+
 .seg button[aria-pressed='true'] {
-  background: var(--accent);
+  background: linear-gradient(180deg, var(--gold-hi) 0%, var(--gold) 100%);
   color: var(--accent-ink);
   box-shadow:
-    -2px 0 0 0 var(--outline),
-    2px 0 0 0 var(--outline),
-    0 -2px 0 0 var(--outline),
-    0 2px 0 0 var(--outline),
-    inset 0 -3px 0 0 var(--gold-lo);
+    0 0 0 2px var(--outline),
+    0 0 0 4px var(--gold),
+    inset 0 -3px 0 0 var(--gold-lo),
+    0 0 12px var(--gold-glow);
 }
 
 .muted {
@@ -311,18 +449,30 @@ a:focus-visible {
   background: none;
   border: 0;
   padding: 0;
+  color: inherit;
   text-decoration: underline;
+  text-underline-offset: 3px;
   cursor: pointer;
 }
+.linklike:hover {
+  color: var(--gold);
+}
 
-/* 閃爍的游標（▶） */
+/* 薩爾達對話框浮動金色游標 */
 .cursor {
   display: inline-block;
-  animation: blink 1s steps(2, start) infinite;
+  color: var(--gold);
+  animation: zelda-float 1.1s ease-in-out infinite;
 }
-@keyframes blink {
-  to {
-    visibility: hidden;
+@keyframes zelda-float {
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  50% {
+    transform: translateY(3px);
+    opacity: 0.55;
   }
 }
 @media (prefers-reduced-motion: reduce) {

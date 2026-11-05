@@ -51,11 +51,17 @@ header {
   text-align: center;
 }
 .kicker {
-  margin: 0 0 6px;
+  display: inline-block;
+  margin: 0 0 8px;
+  padding: 3px 14px;
   font-size: 14px;
-  letter-spacing: 0.08em;
-  color: var(--gold);
-  text-shadow: var(--text-outline);
+  letter-spacing: 0.12em;
+  color: var(--gold-hi);
+  background: rgba(20, 27, 38, 0.72);
+  border: 1px solid var(--gold-border);
+  border-radius: 2px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 .dialog {
   margin-top: 18px;
